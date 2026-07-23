@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 public class Training {
+    private final long trainingId;
     private final long traineeId;
     private final long trainerId;
     private final String trainingName;
@@ -11,7 +12,8 @@ public class Training {
     private final LocalDate trainingDate;
     private final Duration trainingDuration;
 
-    public Training(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Duration trainingDuration) {
+    public Training(long trainingId, long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Duration trainingDuration) {
+        this.trainingId = trainingId;
         this.traineeId = traineeId;
         this.trainerId = trainerId;
         this.trainingName = trainingName;
@@ -43,5 +45,9 @@ public class Training {
 
     public Duration getTrainingDuration() {
         return trainingDuration;
+    }
+
+    public long getTrainingId() {
+        return trainingId;
     }
 }
