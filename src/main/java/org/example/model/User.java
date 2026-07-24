@@ -59,12 +59,12 @@ public abstract class User {
             return true;
         }
 
-        if (object == null || getClass() != object.getClass()) {
+        if (object == null || this.getClass() != object.getClass()) {
             return false;
         }
 
         User user = (User) object;
-        return userId == user.userId;
+        return this.userId == user.userId;
     }
     @Override
     public final int hashCode() {

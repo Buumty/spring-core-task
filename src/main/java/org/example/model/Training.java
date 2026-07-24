@@ -3,7 +3,7 @@ package org.example.model;
 import java.time.Duration;
 import java.time.LocalDate;
 
-public class Training {
+public final class Training {
     private final long trainingId;
     private final long traineeId;
     private final long trainerId;
@@ -49,5 +49,21 @@ public class Training {
 
     public long getTrainingId() {
         return trainingId;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof Training training)) return false;
+
+        return trainingId == training.trainingId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(trainingId);
     }
 }
