@@ -3,7 +3,7 @@ package org.example.model;
 import java.time.LocalDate;
 
 public class Trainee extends User {
-    private LocalDate dateOfBirth;
+    private final LocalDate dateOfBirth;
     private String address;
 
 
