@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TraineeDao {
-    void save(Trainee trainee);
-    void update(Trainee trainee);
+    Trainee save(Trainee trainee);
+    Trainee update(Trainee trainee);
     void deleteById(long id);
     Optional<Trainee> findById(long id);
     List<Trainee> findAll();
