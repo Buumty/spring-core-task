@@ -17,10 +17,6 @@ public class Trainee extends User {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public String getAddress() {
         return address;
     }
