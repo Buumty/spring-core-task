@@ -3,11 +3,13 @@ package org.example.dao.impl;
 import org.example.dao.TrainerDao;
 import org.example.model.Trainer;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Repository
 public class InMemoryTrainerDao implements TrainerDao {
 
     private final Map<Long, Trainer> trainerStorage;

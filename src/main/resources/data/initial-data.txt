@@ -1,0 +1,8 @@
+# Trainee
+TRAINEE|1|John|Smith|John.Smith|abcdefghij|true|1995-05-10|Example address
+
+# Trainer
+TRAINER|2|Anna|Brown|Anna.Brown|qwertyuiop|true|YOGA
+
+# Training
+TRAINING|1|1|2|Morning yoga|YOGA|2026-08-10|PT1H
