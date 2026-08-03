@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class InMemoryTrainerStorage implements TrainerDao {
+public class InMemoryTrainerDao implements TrainerDao {
 
     private final Map<Long, Trainer> trainerStorage;
 
-    public InMemoryTrainerStorage(@Qualifier("trainerStorage") Map<Long, Trainer> trainerStorage) {
+    public InMemoryTrainerDao(@Qualifier("trainerStorage") Map<Long, Trainer> trainerStorage) {
         this.trainerStorage = trainerStorage;
     }
 
@@ -36,5 +36,13 @@ public class InMemoryTrainerStorage implements TrainerDao {
     @Override
     public List<Trainer> findAll() {
         return List.copyOf(trainerStorage.values());
+    }
+    @Override
+    public boolean existsByUsername(String username) {
+        return trainerStorage.values()
+                .stream()
+                .anyMatch(trainer ->
+                        trainer.getUsername().equals(username)
+                );
     }
 }

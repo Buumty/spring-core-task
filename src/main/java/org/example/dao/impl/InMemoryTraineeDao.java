@@ -44,4 +44,13 @@ public class InMemoryTraineeDao implements TraineeDao {
     public List<Trainee> findAll() {
         return List.copyOf(traineeStorage.values());
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return traineeStorage.values()
+                .stream()
+                .anyMatch(trainee ->
+                        trainee.getUsername().equals(username)
+                );
+    }
 }

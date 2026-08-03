@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class InMemoryTrainingStorage implements TrainingDao {
+public class InMemoryTrainingDao implements TrainingDao {
     private final Map<Long,Training> trainingStorage;
 
-    public InMemoryTrainingStorage(@Qualifier("trainingStorage") Map<Long, Training> trainingStorage) {
+    public InMemoryTrainingDao(@Qualifier("trainingStorage") Map<Long, Training> trainingStorage) {
         this.trainingStorage = trainingStorage;
     }
 

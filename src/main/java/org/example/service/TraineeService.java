@@ -60,7 +60,7 @@ public class TraineeService {
         return traineeDao.update(traineeFromDB);
     }
 
-    public void delete(long id) {
+    public void deleteById(long id) {
         findById(id);
         traineeDao.deleteById(id);
     }
