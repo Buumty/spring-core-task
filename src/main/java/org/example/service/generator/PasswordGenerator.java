@@ -8,6 +8,6 @@ public class PasswordGenerator {
     private static final int PASSWORD_LENGTH = 10;
 
     public String generate() {
-        return RandomStringUtils.secure().nextAlphanumeric(10);
+        return RandomStringUtils.secure().nextAlphanumeric(PASSWORD_LENGTH);
     }
 }

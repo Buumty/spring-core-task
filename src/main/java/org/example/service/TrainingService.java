@@ -4,6 +4,8 @@ import org.example.dao.TrainingDao;
 import org.example.model.Training;
 import org.example.model.TrainingType;
 import org.example.service.generator.IdGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -13,6 +15,9 @@ import java.util.List;
 
 @Service
 public class TrainingService {
+    private static final Logger log =
+            LoggerFactory.getLogger(TrainingService.class);
+
     private final TrainingDao trainingDao;
     private final IdGenerator idGenerator;
 
@@ -22,15 +27,20 @@ public class TrainingService {
     }
 
     public Training findById(long id) {
-        return trainingDao.findById(id).orElseThrow(NoSuchElementException::new);
+        log.debug("Searching for training with id={}", id);
+        return trainingDao.findById(id).orElseThrow(() -> {
+            log.warn("Training with id={} was not found", id);
+            return new NoSuchElementException("Training with id " + id + " was not found");
+        });
     }
 
     public List<Training> findAll() {
+        log.debug("Retrieving all trainings");
         return trainingDao.findAll();
     }
 
     public Training create(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Duration trainingDuration) {
-        return trainingDao.save(new Training(
+        Training savedTraining = trainingDao.save(new Training(
                 idGenerator.nextTrainingId(),
                 traineeId,
                 trainerId,
@@ -39,5 +49,14 @@ public class TrainingService {
                 trainingDate,
                 trainingDuration
         ));
+
+        log.info(
+                "Created training id={}, traineeId={}, trainerId={}, name={}",
+                savedTraining.getTrainingId(),
+                savedTraining.getTraineeId(),
+                savedTraining.getTrainerId(),
+                savedTraining.getTrainingName()
+        );
+        return savedTraining;
     }
 }

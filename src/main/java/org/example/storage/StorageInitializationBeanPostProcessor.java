@@ -4,14 +4,16 @@ import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
 import org.example.model.TrainingType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -26,6 +28,9 @@ import java.util.Map;
 @Component
 public class StorageInitializationBeanPostProcessor
         implements BeanPostProcessor, EnvironmentAware, ResourceLoaderAware {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(StorageInitializationBeanPostProcessor.class);
 
     private static final String STORAGE_FILE_PROPERTY =
             "storage.data.file";
@@ -81,6 +86,11 @@ public class StorageInitializationBeanPostProcessor
                                 trainee
                         )
                 );
+
+        log.info(
+                "Initialized trainee storage with {} records",
+                storage.size()
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -97,6 +107,10 @@ public class StorageInitializationBeanPostProcessor
                                 trainer
                         )
                 );
+        log.info(
+                "Initialized trainer storage with {} records",
+                storage.size()
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -113,12 +127,16 @@ public class StorageInitializationBeanPostProcessor
                                 training
                         )
                 );
+        log.info(
+                "Initialized training storage with {} records",
+                storage.size()
+        );
     }
 
     private Trainee parseTrainee(String line) {
         String[] values = line.split("\\|", -1);
 
-        validateColumnCount(values, 9, line);
+        validateColumnCount(values, 9);
 
         return new Trainee(
                 Long.parseLong(values[1]),
@@ -135,7 +153,7 @@ public class StorageInitializationBeanPostProcessor
     private Trainer parseTrainer(String line) {
         String[] values = line.split("\\|", -1);
 
-        validateColumnCount(values, 8, line);
+        validateColumnCount(values, 8);
 
         return new Trainer(
                 Long.parseLong(values[1]),
@@ -151,7 +169,7 @@ public class StorageInitializationBeanPostProcessor
     private Training parseTraining(String line) {
         String[] values = line.split("\\|", -1);
 
-        validateColumnCount(values, 8, line);
+        validateColumnCount(values, 8);
 
         return new Training(
                 Long.parseLong(values[1]),
@@ -177,10 +195,21 @@ public class StorageInitializationBeanPostProcessor
                 STORAGE_FILE_PROPERTY
         );
 
+        log.debug(
+                "Loading storage initialization data from {}",
+                location
+        );
+
+
         Resource resource =
                 resourceLoader.getResource(location);
 
         if (!resource.exists()) {
+            log.error(
+                    "Storage initialization file does not exist: {}",
+                    location
+            );
+
             throw new BeanInitializationException(
                     "Storage initialization file does not exist: "
                             + location
@@ -200,7 +229,13 @@ public class StorageInitializationBeanPostProcessor
                     .filter(line -> !line.isEmpty())
                     .filter(line -> !line.startsWith("#"))
                     .toList();
-        } catch (IOException exception) {
+        } catch(IOException exception) {
+            log.error(
+                    "Failed to read storage initialization file: {}",
+                    location,
+                    exception
+            );
+
             throw new BeanInitializationException(
                     "Cannot read storage initialization file: "
                             + location,
@@ -211,8 +246,7 @@ public class StorageInitializationBeanPostProcessor
 
     private void validateColumnCount(
             String[] values,
-            int expectedCount,
-            String line
+            int expectedCount
     ) {
         if (values.length != expectedCount) {
             throw new BeanInitializationException(
@@ -220,8 +254,6 @@ public class StorageInitializationBeanPostProcessor
                             + expectedCount
                             + " values, but received "
                             + values.length
-                            + ": "
-                            + line
             );
         }
     }
