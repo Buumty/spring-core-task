@@ -2,7 +2,7 @@ package dao.impl;
 
 import org.example.dao.impl.InMemoryTrainerDao;
 import org.example.model.Trainer;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class InMemoryTrainerDaoTest {
                 "John",
                 "Smith",
                 "John.Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         Trainer savedTrainer = trainerDao.save(trainer);
@@ -47,7 +47,7 @@ class InMemoryTrainerDaoTest {
                 "John",
                 "Smith",
                 "John.Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         trainerStorage.put(trainer.getUserId(), trainer);
@@ -70,7 +70,7 @@ class InMemoryTrainerDaoTest {
                 "John",
                 "Smith",
                 "John.Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         Trainer secondTrainer = createTrainer(
@@ -78,7 +78,7 @@ class InMemoryTrainerDaoTest {
                 "Anna",
                 "Brown",
                 "Anna.Brown",
-                TrainingType.YOGA
+                TrainingTypeName.YOGA
         );
 
         trainerStorage.put(firstTrainer.getUserId(), firstTrainer);
@@ -105,7 +105,7 @@ class InMemoryTrainerDaoTest {
                 "John",
                 "Smith",
                 "John.Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         Trainer updatedTrainer = new Trainer(
@@ -115,7 +115,7 @@ class InMemoryTrainerDaoTest {
                 "John.Smith",
                 "abcdefghij",
                 false,
-                TrainingType.CARDIO
+                TrainingTypeName.CARDIO
         );
 
         trainerStorage.put(
@@ -129,7 +129,7 @@ class InMemoryTrainerDaoTest {
         assertSame(updatedTrainer, trainerStorage.get(1L));
         assertEquals("Jonathan", result.getFirstName());
         assertEquals("Smith", result.getLastName());
-        assertEquals(TrainingType.CARDIO, result.getSpecialization());
+        assertEquals(TrainingTypeName.CARDIO, result.getSpecialization());
         assertFalse(result.isActive());
     }
     @Test
@@ -139,7 +139,7 @@ class InMemoryTrainerDaoTest {
                 "John",
                 "Smith",
                 "John.Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         trainerStorage.put(trainer.getUserId(), trainer);
@@ -157,7 +157,7 @@ class InMemoryTrainerDaoTest {
             String firstName,
             String lastName,
             String username,
-            TrainingType specialization
+            TrainingTypeName specialization
     ) {
         return new Trainer(
                 userId,

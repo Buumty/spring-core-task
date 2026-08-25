@@ -2,7 +2,7 @@ package service;
 
 import org.example.dao.TrainingDao;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.TrainingService;
 import org.example.service.generator.IdGenerator;
 import org.junit.jupiter.api.Test;
@@ -67,7 +67,7 @@ class TrainingServiceTest {
                 11L,
                 21L,
                 "Cardio training",
-                TrainingType.CARDIO,
+                TrainingTypeName.CARDIO,
                 LocalDate.of(2026, 8, 11),
                 Duration.ofMinutes(45)
         );
@@ -97,7 +97,7 @@ class TrainingServiceTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 trainingDate,
                 trainingDuration
         );
@@ -110,7 +110,7 @@ class TrainingServiceTest {
                 result.getTrainingName()
         );
         assertEquals(
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 result.getTrainingType()
         );
         assertEquals(trainingDate, result.getTrainingDate());
@@ -129,7 +129,7 @@ class TrainingServiceTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 LocalDate.of(2026, 8, 10),
                 Duration.ofMinutes(60)
         );

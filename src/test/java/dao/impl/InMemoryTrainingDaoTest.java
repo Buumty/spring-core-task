@@ -2,7 +2,7 @@ package dao.impl;
 
 import org.example.dao.impl.InMemoryTrainingDao;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class InMemoryTrainingDaoTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         Training savedTraining = trainingDao.save(training);
@@ -49,7 +49,7 @@ class InMemoryTrainingDaoTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         trainingStorage.put(training.getTrainingId(), training);
@@ -72,7 +72,7 @@ class InMemoryTrainingDaoTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         Training secondTraining = createTraining(
@@ -80,7 +80,7 @@ class InMemoryTrainingDaoTest {
                 11L,
                 21L,
                 "Cardio training",
-                TrainingType.CARDIO
+                TrainingTypeName.CARDIO
         );
 
         trainingStorage.put(
@@ -112,7 +112,7 @@ class InMemoryTrainingDaoTest {
             long traineeId,
             long trainerId,
             String trainingName,
-            TrainingType trainingType
+            TrainingTypeName trainingType
     ) {
         return new Training(
                 trainingId,

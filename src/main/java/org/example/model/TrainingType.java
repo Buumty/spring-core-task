@@ -1,8 +1,35 @@
 package org.example.model;
 
-public enum TrainingType {
-    FITNESS,
-    STRENGTH,
-    CARDIO,
-    YOGA
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "training_types")
+public class TrainingType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long trainingTypeId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+            name = "training_type_name",
+            nullable = false,
+            unique = true,
+            updatable = false
+    )
+    private TrainingTypeName trainingTypeName;
+
+    private TrainingType trainingType() {}
+
+    public TrainingType(TrainingTypeName trainingTypeName) {
+        this.trainingTypeName = trainingTypeName;
+    }
+
+    public Long getTrainingTypeId() {
+        return trainingTypeId;
+    }
+
+    public TrainingTypeName getTrainingTypeName() {
+        return trainingTypeName;
+    }
 }

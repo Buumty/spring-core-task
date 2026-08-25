@@ -3,7 +3,7 @@ import org.example.facade.GymFacade;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.TraineeService;
 import org.example.service.TrainerService;
 import org.example.service.TrainingService;
@@ -151,13 +151,13 @@ class GymFacadeTest {
         when(trainerService.create(
                 "John",
                 "Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         )).thenReturn(trainer);
 
         Trainer result = gymFacade.createTrainer(
                 "John",
                 "Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         assertSame(trainer, result);
@@ -165,7 +165,7 @@ class GymFacadeTest {
         verify(trainerService).create(
                 "John",
                 "Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
     }
 
@@ -177,7 +177,7 @@ class GymFacadeTest {
                 "Jonathan",
                 "Johnson",
                 false,
-                TrainingType.CARDIO,
+                TrainingTypeName.CARDIO,
                 1L
         )).thenReturn(trainer);
 
@@ -186,7 +186,7 @@ class GymFacadeTest {
                 "Jonathan",
                 "Johnson",
                 false,
-                TrainingType.CARDIO
+                TrainingTypeName.CARDIO
         );
 
         assertSame(trainer, result);
@@ -195,7 +195,7 @@ class GymFacadeTest {
                 "Jonathan",
                 "Johnson",
                 false,
-                TrainingType.CARDIO,
+                TrainingTypeName.CARDIO,
                 1L
         );
     }
@@ -224,7 +224,7 @@ class GymFacadeTest {
                         "Anna.Brown",
                         "Password2",
                         true,
-                        TrainingType.YOGA
+                        TrainingTypeName.YOGA
                 )
         );
 
@@ -249,7 +249,7 @@ class GymFacadeTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 trainingDate,
                 trainingDuration
         )).thenReturn(training);
@@ -258,7 +258,7 @@ class GymFacadeTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 trainingDate,
                 trainingDuration
         );
@@ -269,7 +269,7 @@ class GymFacadeTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 trainingDate,
                 trainingDuration
         );
@@ -297,7 +297,7 @@ class GymFacadeTest {
                         11L,
                         21L,
                         "Cardio training",
-                        TrainingType.CARDIO,
+                        TrainingTypeName.CARDIO,
                         LocalDate.of(2026, 8, 11),
                         Duration.ofMinutes(45)
                 )
@@ -335,7 +335,7 @@ class GymFacadeTest {
                 "John.Smith",
                 "Abc123xyZ9",
                 true,
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
     }
 
@@ -345,7 +345,7 @@ class GymFacadeTest {
                 10L,
                 20L,
                 "Strength training",
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 LocalDate.of(2026, 8, 10),
                 Duration.ofMinutes(60)
         );

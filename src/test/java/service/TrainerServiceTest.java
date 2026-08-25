@@ -2,7 +2,7 @@ package service;
 
 import org.example.dao.TrainerDao;
 import org.example.model.Trainer;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.TrainerService;
 import org.example.service.generator.IdGenerator;
 import org.example.service.generator.PasswordGenerator;
@@ -75,7 +75,7 @@ class TrainerServiceTest {
                 "Anna.Brown",
                 "Password2",
                 true,
-                TrainingType.YOGA
+                TrainingTypeName.YOGA
         );
 
         when(trainerDao.findAll())
@@ -103,7 +103,7 @@ class TrainerServiceTest {
         Trainer result = trainerService.create(
                 "John",
                 "Smith",
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
 
         assertEquals(1L, result.getUserId());
@@ -112,7 +112,7 @@ class TrainerServiceTest {
         assertEquals("John.Smith", result.getUsername());
         assertEquals("Abc123xyZ9", result.getPassword());
         assertEquals(
-                TrainingType.STRENGTH,
+                TrainingTypeName.STRENGTH,
                 result.getSpecialization()
         );
         assertTrue(result.isActive());
@@ -136,7 +136,7 @@ class TrainerServiceTest {
                 "Jonathan",
                 "Johnson",
                 false,
-                TrainingType.CARDIO,
+                TrainingTypeName.CARDIO,
                 1L
         );
 
@@ -145,7 +145,7 @@ class TrainerServiceTest {
         assertEquals("Johnson", result.getLastName());
         assertFalse(result.isActive());
         assertEquals(
-                TrainingType.CARDIO,
+                TrainingTypeName.CARDIO,
                 result.getSpecialization()
         );
 
@@ -164,7 +164,7 @@ class TrainerServiceTest {
                 "John.Smith",
                 "Abc123xyZ9",
                 true,
-                TrainingType.STRENGTH
+                TrainingTypeName.STRENGTH
         );
     }
 }

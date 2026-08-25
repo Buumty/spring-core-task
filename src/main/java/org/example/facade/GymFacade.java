@@ -3,7 +3,7 @@ package org.example.facade;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.TraineeService;
 import org.example.service.TrainerService;
 import org.example.service.TrainingService;
@@ -75,7 +75,7 @@ public class GymFacade {
     public Trainer createTrainer(
             String firstName,
             String lastName,
-            TrainingType specialization
+            TrainingTypeName specialization
     ) {
         return trainerService.create(
                 firstName,
@@ -89,7 +89,7 @@ public class GymFacade {
             String firstName,
             String lastName,
             boolean active,
-            TrainingType specialization
+            TrainingTypeName specialization
     ) {
         return trainerService.update(
                 firstName,
@@ -112,7 +112,7 @@ public class GymFacade {
             long traineeId,
             long trainerId,
             String trainingName,
-            TrainingType trainingType,
+            TrainingTypeName trainingType,
             LocalDate trainingDate,
             Duration trainingDuration
     ) {

@@ -3,7 +3,7 @@ package org.example.storage;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -162,7 +162,7 @@ public class StorageInitializationBeanPostProcessor
                 values[4],
                 values[5],
                 Boolean.parseBoolean(values[6]),
-                TrainingType.valueOf(values[7])
+                TrainingTypeName.valueOf(values[7])
         );
     }
 
@@ -176,7 +176,7 @@ public class StorageInitializationBeanPostProcessor
                 Long.parseLong(values[2]),
                 Long.parseLong(values[3]),
                 values[4],
-                TrainingType.valueOf(values[5]),
+                TrainingTypeName.valueOf(values[5]),
                 LocalDate.parse(values[6]),
                 Duration.parse(values[7])
         );

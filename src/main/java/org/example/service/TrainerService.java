@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.TrainerDao;
 import org.example.model.Trainer;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.generator.IdGenerator;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
@@ -43,7 +43,7 @@ public class TrainerService {
         return trainerDao.findAll();
     }
 
-    public Trainer create(String firstName, String lastName, TrainingType specialization) {
+    public Trainer create(String firstName, String lastName, TrainingTypeName specialization) {
         Trainer savedTrainer = trainerDao.save(new Trainer(
                 idGenerator.nextUserId(),
                 firstName,
@@ -66,7 +66,7 @@ public class TrainerService {
             String firstName,
             String lastName,
             boolean isActive,
-            TrainingType specialization,
+            TrainingTypeName specialization,
             long id
     ) {
         Trainer trainerFromDB = findById(id);

@@ -1,22 +1,37 @@
 package org.example.model;
 
-public abstract class User {
-    private final long userId;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long userId;
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-    private final String username;
-    private final String password;
+    @Column(name = "username", nullable = false, unique = true, updatable = false)
+    private String username;
+    @Column(name = "password", nullable = false)
+    private String password;
+    @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
+    protected User() {
+    }
 
-    protected User(long userId, String firstName, String lastName, String username, String password, boolean isActive) {
-        this.userId = userId;
+    public User(String firstName, String lastName, String username, String password, boolean isActive) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
         this.isActive = isActive;
     }
+
+
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -41,6 +56,9 @@ public abstract class User {
     public String getPassword() {
         return password;
     }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public boolean isActive() {
         return isActive;
@@ -50,26 +68,7 @@ public abstract class User {
         isActive = active;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
-    }
-    @Override
-    public final boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-
-        if (object == null || this.getClass() != object.getClass()) {
-            return false;
-        }
-
-        User user = (User) object;
-        return this.userId == user.userId;
-    }
-    @Override
-    public final int hashCode() {
-        int result = getClass().hashCode();
-        result = 31 * result + Long.hashCode(userId);
-        return result;
     }
 }

@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.TrainingDao;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.service.generator.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class TrainingService {
         return trainingDao.findAll();
     }
 
-    public Training create(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Duration trainingDuration) {
+    public Training create(long traineeId, long trainerId, String trainingName, TrainingTypeName trainingType, LocalDate trainingDate, Duration trainingDuration) {
         Training savedTraining = trainingDao.save(new Training(
                 idGenerator.nextTrainingId(),
                 traineeId,

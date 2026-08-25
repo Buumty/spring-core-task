@@ -3,7 +3,7 @@ package storage;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
-import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
 import org.example.storage.StorageInitializationBeanPostProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +94,7 @@ class StorageInitializationBeanPostProcessorTest {
         assertEquals("Anna.Brown", trainer.getUsername());
         assertTrue(trainer.isActive());
         assertEquals(
-                TrainingType.YOGA,
+                TrainingTypeName.YOGA,
                 trainer.getSpecialization()
         );
     }
@@ -121,7 +121,7 @@ class StorageInitializationBeanPostProcessorTest {
         assertEquals(2L, training.getTrainerId());
         assertEquals("Morning yoga", training.getTrainingName());
         assertEquals(
-                TrainingType.YOGA,
+                TrainingTypeName.YOGA,
                 training.getTrainingType()
         );
         assertEquals(
