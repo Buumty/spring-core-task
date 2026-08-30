@@ -1,10 +1,8 @@
 package org.example.service;
 
 import org.example.dao.TrainerDao;
-import org.example.model.Trainee;
-import org.example.model.Trainer;
-import org.example.model.TrainingTypeName;
-import org.example.model.User;
+import org.example.dao.TrainingTypeDao;
+import org.example.model.*;
 import org.example.service.authentication.AuthenticationService;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
@@ -24,12 +22,14 @@ public class TrainerService {
             LoggerFactory.getLogger(TrainerService.class);
 
     private final TrainerDao trainerDao;
+    private final TrainingTypeDao trainingTypeDao;
     private final PasswordGenerator passwordGenerator;
     private final UsernameGenerator usernameGenerator;
     private final AuthenticationService authenticationService;
 
-    public TrainerService(TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
+    public TrainerService(TrainerDao trainerDao, TrainingTypeDao trainingTypeDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
         this.trainerDao = trainerDao;
+        this.trainingTypeDao = trainingTypeDao;
         this.passwordGenerator = passwordGenerator;
         this.usernameGenerator = usernameGenerator;
         this.authenticationService = authenticationService;
@@ -55,8 +55,13 @@ public class TrainerService {
                 usernameGenerator.generate(firstName, lastName),
                 passwordGenerator.generate(),
                 true);
-        Trainer savedTrainer = trainerDao.save(new Trainer(specialization,
+
+        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow();
+
+        Trainer savedTrainer = trainerDao.save(new Trainer(trainingType,
                 user));
+
+
 
         log.info(
                 "Created trainer id={}, username={}",
@@ -79,9 +84,11 @@ public class TrainerService {
         authenticationService.requireTrainerAuthentication(username,password);
         Trainer trainerFromDB = findById(id);
 
+        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow();
+
         trainerFromDB.getUser().setFirstName(firstName);
         trainerFromDB.getUser().setLastName(lastName);
-        trainerFromDB.setSpecialization(specialization);
+        trainerFromDB.setSpecialization(trainingType);
 
         Trainer updatedTrainer = trainerDao.update(trainerFromDB);
 
@@ -129,7 +136,7 @@ public class TrainerService {
 
         Trainer trainer = trainerDao.findByUsername(username).orElseThrow();
 
-        if (trainer.getUser().isActive()) {
+        if (!trainer.getUser().isActive()) {
             throw new IllegalStateException(
                     "Trainer is already inactive"
             );

@@ -5,8 +5,10 @@ import org.example.dao.TrainerDao;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class AuthenticationService {
     private final TraineeDao traineeDao;
     private final TrainerDao trainerDao;

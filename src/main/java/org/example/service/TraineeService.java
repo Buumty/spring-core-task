@@ -148,7 +148,7 @@ public class TraineeService {
 
         Trainee trainee = traineeDao.findByUsername(username).orElseThrow();
 
-        if (trainee.getUser().isActive()) {
+        if (!trainee.getUser().isActive()) {
             throw new IllegalStateException(
                     "Trainee is already inactive"
             );

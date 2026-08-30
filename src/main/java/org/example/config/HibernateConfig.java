@@ -1,9 +1,11 @@
 package org.example.config;
 
+import org.hibernate.SessionFactory;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
 import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -76,5 +78,12 @@ public class HibernateConfig {
         );
 
         return properties;
+    }
+
+    @Bean
+    public HibernateTransactionManager transactionManager(
+            SessionFactory sessionFactory
+    ) {
+        return new HibernateTransactionManager(sessionFactory);
     }
 }

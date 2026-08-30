@@ -29,11 +29,11 @@ public class Trainer {
             name = "training_type_id",
             nullable = false
     )
-    private TrainingTypeName specialization;
+    private TrainingType specialization;
 
     protected Trainer(){}
 
-    public Trainer(TrainingTypeName specialization, User user) {
+    public Trainer(TrainingType specialization, User user) {
         this.specialization = specialization;
         this.user = user;
     }
@@ -46,11 +46,11 @@ public class Trainer {
         return user;
     }
 
-    public TrainingTypeName getSpecialization() {
+    public TrainingType getSpecialization() {
         return specialization;
     }
 
-    public void setSpecialization(TrainingTypeName specialization) {
+    public void setSpecialization(TrainingType specialization) {
         this.specialization = specialization;
     }
 }

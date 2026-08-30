@@ -3,13 +3,13 @@ package org.example.facade;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
+import org.example.model.TrainingType;
 import org.example.model.TrainingTypeName;
 import org.example.service.TraineeService;
 import org.example.service.TrainerService;
 import org.example.service.TrainingService;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -49,7 +49,6 @@ public class GymFacade {
             String firstName,
             String lastName,
             String address,
-            boolean active,
             String username,
             String password
     ) {
@@ -63,8 +62,16 @@ public class GymFacade {
         );
     }
 
-    public void deleteTrainee(long traineeId) {
-        traineeService.deleteById(traineeId);
+    public void deleteTrainee(
+            long traineeId,
+            String username,
+            String password
+    ) {
+        traineeService.deleteById(
+                traineeId,
+                username,
+                password
+        );
     }
 
     public Trainee findTraineeById(long traineeId) {
@@ -73,6 +80,38 @@ public class GymFacade {
 
     public List<Trainee> findAllTrainees() {
         return traineeService.findAll();
+    }
+
+    public void changeTraineePassword(
+            String username,
+            String oldPassword,
+            String newPassword
+    ) {
+        traineeService.changePassword(
+                username,
+                oldPassword,
+                newPassword
+        );
+    }
+
+    public void activateTrainee(
+            String username,
+            String password
+    ) {
+        traineeService.activate(
+                username,
+                password
+        );
+    }
+
+    public void deactivateTrainee(
+            String username,
+            String password
+    ) {
+        traineeService.deactivate(
+                username,
+                password
+        );
     }
 
     public Trainer createTrainer(
@@ -91,15 +130,17 @@ public class GymFacade {
             long trainerId,
             String firstName,
             String lastName,
-            boolean active,
-            TrainingTypeName specialization
+            TrainingTypeName specialization,
+            String username,
+            String password
     ) {
         return trainerService.update(
                 firstName,
                 lastName,
-                active,
                 specialization,
-                trainerId
+                trainerId,
+                username,
+                password
         );
     }
 
@@ -111,13 +152,45 @@ public class GymFacade {
         return trainerService.findAll();
     }
 
+    public void changeTrainerPassword(
+            String username,
+            String oldPassword,
+            String newPassword
+    ) {
+        trainerService.changePassword(
+                username,
+                oldPassword,
+                newPassword
+        );
+    }
+
+    public void activateTrainer(
+            String username,
+            String password
+    ) {
+        trainerService.activate(
+                username,
+                password
+        );
+    }
+
+    public void deactivateTrainer(
+            String username,
+            String password
+    ) {
+        trainerService.deactivate(
+                username,
+                password
+        );
+    }
+
     public Training createTraining(
             long traineeId,
             long trainerId,
             String trainingName,
-            TrainingTypeName trainingType,
+            TrainingType trainingType,
             LocalDate trainingDate,
-            Duration trainingDuration
+            Integer trainingDuration
     ) {
         return trainingService.create(
                 traineeId,
