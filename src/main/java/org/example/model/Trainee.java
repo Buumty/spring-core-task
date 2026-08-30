@@ -3,6 +3,8 @@ package org.example.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "trainees")
@@ -27,6 +29,14 @@ public class Trainee {
     private LocalDate dateOfBirth;
     @Column(name = "address")
     private String address;
+
+    @OneToMany(
+            mappedBy = "trainee",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Set<Training> trainings =
+            new HashSet<>();
 
     protected Trainee(){}
 

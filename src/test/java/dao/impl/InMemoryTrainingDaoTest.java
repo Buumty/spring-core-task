@@ -1,6 +1,6 @@
 package dao.impl;
 
-import org.example.dao.impl.InMemoryTrainingDao;
+import org.example.dao.impl.TrainingDaoImpl;
 import org.example.model.Training;
 import org.example.model.TrainingTypeName;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryTrainingDaoTest {
 
     private Map<Long, Training> trainingStorage;
-    private InMemoryTrainingDao trainingDao;
+    private TrainingDaoImpl trainingDao;
 
     @BeforeEach
     void setUp() {
         trainingStorage = new HashMap<>();
-        trainingDao = new InMemoryTrainingDao(trainingStorage);
+        trainingDao = new TrainingDaoImpl(trainingStorage);
     }
 
     @Test

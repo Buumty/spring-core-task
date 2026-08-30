@@ -4,7 +4,6 @@ import org.example.dao.TrainerDao;
 import org.example.model.Trainer;
 import org.example.model.TrainingTypeName;
 import org.example.service.TrainerService;
-import org.example.service.generator.IdGenerator;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
 import org.junit.jupiter.api.Test;
@@ -25,9 +24,6 @@ class TrainerServiceTest {
 
     @Mock
     private TrainerDao trainerDao;
-
-    @Mock
-    private IdGenerator idGenerator;
 
     @Mock
     private PasswordGenerator passwordGenerator;

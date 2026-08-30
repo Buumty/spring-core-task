@@ -1,6 +1,6 @@
 package dao.impl;
 
-import org.example.dao.impl.InMemoryTraineeDao;
+import org.example.dao.impl.TraineeDaoImpl;
 import org.example.model.Trainee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryTraineeDaoTest {
 
     private Map<Long, Trainee> traineeStorage;
-    private InMemoryTraineeDao traineeDao;
+    private TraineeDaoImpl traineeDao;
 
     @BeforeEach
     void setUp() {
         traineeStorage = new HashMap<>();
-        traineeDao = new InMemoryTraineeDao(traineeStorage);
+        traineeDao = new TraineeDaoImpl(traineeStorage);
     }
 
     @Test

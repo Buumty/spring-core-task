@@ -12,4 +12,5 @@ public interface TraineeDao {
     Optional<Trainee> findById(long id);
     List<Trainee> findAll();
     boolean existsByUsername(String username);
+    Optional<Trainee> findByUsername(String username);
 }

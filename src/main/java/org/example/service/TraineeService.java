@@ -2,34 +2,36 @@ package org.example.service;
 
 import org.example.dao.TraineeDao;
 import org.example.model.Trainee;
-import org.example.service.generator.IdGenerator;
+import org.example.model.User;
+import org.example.service.authentication.AuthenticationService;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Service
+@Transactional(readOnly = true)
 public class TraineeService {
     private static final Logger log =
             LoggerFactory.getLogger(TraineeService.class);
 
     private final TraineeDao traineeDao;
-    private final IdGenerator idGenerator;
     private final PasswordGenerator passwordGenerator;
     private final UsernameGenerator usernameGenerator;
+    private final AuthenticationService authenticationService;
 
 
-    public TraineeService(TraineeDao traineeDao, IdGenerator idGenerator, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator) {
+    public TraineeService(TraineeDao traineeDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
         this.traineeDao = traineeDao;
-        this.idGenerator = idGenerator;
         this.passwordGenerator = passwordGenerator;
         this.usernameGenerator = usernameGenerator;
+        this.authenticationService = authenticationService;
     }
 
     public Trainee findById(long id) {
@@ -45,47 +47,51 @@ public class TraineeService {
         return traineeDao.findAll();
     }
 
+    @Transactional
     public Trainee create(
             String firstName,
             String lastName,
             LocalDate dateOfBirth,
             String address
     ) {
-        Trainee trainee = new Trainee(
-                idGenerator.nextUserId(),
-                firstName,
+
+        User user = new User(firstName,
                 lastName,
                 usernameGenerator.generate(firstName, lastName),
                 passwordGenerator.generate(),
-                true,
+                true);
+
+        Trainee trainee = new Trainee(user,
                 dateOfBirth,
-                address
-        );
+                address);
+
 
         Trainee savedTrainee = traineeDao.save(trainee);
 
         log.info(
                 "Created trainee id={}, username={}",
-                savedTrainee.getUserId(),
-                savedTrainee.getUsername()
+                savedTrainee.getTraineeId(),
+                savedTrainee.getUser().getUsername()
         );
 
         return savedTrainee;
     }
 
+    @Transactional
     public Trainee update(
             String firstName,
             String lastName,
             String address,
-            boolean isActive,
-            long id
+            long id,
+            String username,
+            String password
     ) {
+        authenticationService.requireTraineeAuthentication(username,password);
         Trainee traineeFromDB = findById(id);
 
-        traineeFromDB.setFirstName(firstName);
-        traineeFromDB.setLastName(lastName);
+        traineeFromDB.getUser().setFirstName(firstName);
+        traineeFromDB.getUser().setLastName(lastName);
         traineeFromDB.setAddress(address);
-        traineeFromDB.setActive(isActive);
 
         Trainee updatedTrainee = traineeDao.update(traineeFromDB);
 
@@ -94,10 +100,60 @@ public class TraineeService {
         return updatedTrainee;
     }
 
-    public void deleteById(long id) {
+    @Transactional
+    public void deleteById(long id, String username, String password) {
+        authenticationService.requireTraineeAuthentication(username,password);
         findById(id);
         traineeDao.deleteById(id);
 
         log.info("Deleted trainee id={}", id);
+    }
+
+    @Transactional
+    public void changePassword(
+            String username,
+            String oldPassword,
+            String newPassword
+    ) {
+        authenticationService
+                .requireTraineeAuthentication(
+                        username,
+                        oldPassword
+                );
+
+        Trainee trainee =
+                traineeDao.findByUsername(username).orElseThrow();
+
+        trainee.getUser().setPassword(newPassword);
+    }
+
+    @Transactional
+    public void activate(String username, String password) {
+        authenticationService.requireTraineeAuthentication(username,password);
+
+        Trainee trainee = traineeDao.findByUsername(username).orElseThrow();
+
+        if (trainee.getUser().isActive()) {
+            throw new IllegalStateException(
+                    "Trainee is already active"
+            );
+        }
+
+        trainee.getUser().setActive(true);
+    }
+
+    @Transactional
+    public void deactivate(String username, String password) {
+        authenticationService.requireTraineeAuthentication(username,password);
+
+        Trainee trainee = traineeDao.findByUsername(username).orElseThrow();
+
+        if (trainee.getUser().isActive()) {
+            throw new IllegalStateException(
+                    "Trainee is already inactive"
+            );
+        }
+
+        trainee.getUser().setActive(false);
     }
 }

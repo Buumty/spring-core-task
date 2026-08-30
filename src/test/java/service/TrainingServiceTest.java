@@ -4,7 +4,6 @@ import org.example.dao.TrainingDao;
 import org.example.model.Training;
 import org.example.model.TrainingTypeName;
 import org.example.service.TrainingService;
-import org.example.service.generator.IdGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,9 +24,6 @@ class TrainingServiceTest {
 
     @Mock
     private TrainingDao trainingDao;
-
-    @Mock
-    private IdGenerator idGenerator;
 
     @InjectMocks
     private TrainingService trainingService;

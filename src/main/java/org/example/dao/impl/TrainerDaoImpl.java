@@ -1,0 +1,73 @@
+package org.example.dao.impl;
+
+import org.example.dao.TrainerDao;
+import org.example.model.Trainee;
+import org.example.model.Trainer;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Repository
+public class TrainerDaoImpl implements TrainerDao {
+
+    private final SessionFactory sessionFactory;
+
+    public TrainerDaoImpl(SessionFactory sessionFactory) {
+
+        this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public Trainer save(Trainer trainer) {
+        sessionFactory.getCurrentSession().persist(trainer);
+        return trainer;
+    }
+
+    @Override
+    public Trainer update(Trainer trainer) {
+        sessionFactory.getCurrentSession().merge(trainer);
+        return trainer;
+    }
+
+    @Override
+    public Optional<Trainer> findById(long id) {
+        return Optional.ofNullable(sessionFactory.getCurrentSession().find(Trainer.class, id));
+    }
+
+    @Override
+    public List<Trainer> findAll() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("From Trainer", Trainer.class)
+                .getResultList();
+    }
+    @Override
+    public boolean existsByUsername(String username) {
+        Long count = sessionFactory
+                .getCurrentSession()
+                .createQuery("""
+                        SELECT COUNT(t)
+                        FROM Trainer t
+                        WHERE t.user.username = :username
+                        """, Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+
+        return count > 0;
+    }
+
+    @Override
+    public Optional<Trainer> findByUsername(String username) {
+        return sessionFactory
+                .getCurrentSession()
+                .createQuery("""
+                        FROM Trainer t
+                        WHERE t.user.username = :username
+                        """, Trainer.class)
+                .setParameter("username", username)
+                .uniqueResultOptional();
+    }
+}

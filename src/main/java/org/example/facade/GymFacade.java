@@ -49,14 +49,17 @@ public class GymFacade {
             String firstName,
             String lastName,
             String address,
-            boolean active
+            boolean active,
+            String username,
+            String password
     ) {
         return traineeService.update(
                 firstName,
                 lastName,
                 address,
-                active,
-                traineeId
+                traineeId,
+                username,
+                password
         );
     }
 

@@ -1,29 +1,33 @@
 package org.example.service;
 
+import org.example.dao.TraineeDao;
+import org.example.dao.TrainerDao;
 import org.example.dao.TrainingDao;
-import org.example.model.Training;
-import org.example.model.TrainingTypeName;
-import org.example.service.generator.IdGenerator;
+import org.example.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
+@Transactional(readOnly = true)
 public class TrainingService {
     private static final Logger log =
             LoggerFactory.getLogger(TrainingService.class);
 
     private final TrainingDao trainingDao;
-    private final IdGenerator idGenerator;
+    private final TraineeDao traineeDao;
+    private final TrainerDao trainerDao;
 
-    public TrainingService(TrainingDao trainingDao, IdGenerator idGenerator) {
+    public TrainingService(TrainingDao trainingDao, TraineeDao traineeDao, TrainerDao trainerDao) {
         this.trainingDao = trainingDao;
-        this.idGenerator = idGenerator;
+        this.traineeDao = traineeDao;
+        this.trainerDao = trainerDao;
     }
 
     public Training findById(long id) {
@@ -39,11 +43,23 @@ public class TrainingService {
         return trainingDao.findAll();
     }
 
-    public Training create(long traineeId, long trainerId, String trainingName, TrainingTypeName trainingType, LocalDate trainingDate, Duration trainingDuration) {
+    @Transactional
+    public Training create(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Integer trainingDuration) {
+        log.debug("Searching for trainee with id={}", traineeId);
+        Trainee trainee = traineeDao.findById(traineeId).orElseThrow(() -> {
+            log.warn("Trainee with id={} was not found", traineeId);
+            return new NoSuchElementException("Trainee with id " + traineeId + " was not found");
+        });
+
+        log.debug("Searching for trainer with id={}", trainerId);
+        Trainer trainer = trainerDao.findById(trainerId).orElseThrow(() -> {
+            log.warn("Trainer with id={} was not found", trainerId);
+            return new NoSuchElementException("Trainee with id " + trainerId + " was not found");
+        });
+
         Training savedTraining = trainingDao.save(new Training(
-                idGenerator.nextTrainingId(),
-                traineeId,
-                trainerId,
+                trainee,
+                trainer,
                 trainingName,
                 trainingType,
                 trainingDate,
@@ -53,8 +69,8 @@ public class TrainingService {
         log.info(
                 "Created training id={}, traineeId={}, trainerId={}, name={}",
                 savedTraining.getTrainingId(),
-                savedTraining.getTraineeId(),
-                savedTraining.getTrainerId(),
+                savedTraining.getTrainee().getUser().getUserId(),
+                savedTraining.getTrainer().getUser().getUserId(),
                 savedTraining.getTrainingName()
         );
         return savedTraining;
