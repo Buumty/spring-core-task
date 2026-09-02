@@ -34,11 +34,9 @@ public class TraineeDaoImpl implements TraineeDao {
 
     @Override
     public void deleteById(long id) {
-        Trainee trainee = sessionFactory.getCurrentSession().find(Trainee.class, id);
+        Trainee trainee = sessionFactory.getCurrentSession().getReference(Trainee.class, id);
 
-        if (trainee != null) {
-            sessionFactory.getCurrentSession().remove(trainee);
-        }
+        sessionFactory.getCurrentSession().remove(trainee);
     }
 
     @Override
