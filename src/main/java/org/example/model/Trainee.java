@@ -38,6 +38,14 @@ public class Trainee {
     private Set<Training> trainings =
             new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "trainee_trainer",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private Set<Trainer> trainers = new HashSet<>();
+
     protected Trainee(){}
 
 

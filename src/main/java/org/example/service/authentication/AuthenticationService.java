@@ -50,4 +50,18 @@ public class AuthenticationService {
             throw new SecurityException("Invalid credentials");
         }
     }
+    public void requireAuthentication(
+            String username,
+            String password
+    ) {
+        boolean traineeAuthenticated =
+                traineeCredentialsValidation(username, password);
+
+        boolean trainerAuthenticated =
+                trainerCredentialsValidation(username, password);
+
+        if (!traineeAuthenticated && !trainerAuthenticated) {
+            throw new SecurityException("Invalid credentials");
+        }
+    }
 }

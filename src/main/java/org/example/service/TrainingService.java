@@ -3,13 +3,14 @@ package org.example.service;
 import org.example.dao.TraineeDao;
 import org.example.dao.TrainerDao;
 import org.example.dao.TrainingDao;
+import org.example.dao.TrainingTypeDao;
 import org.example.model.*;
+import org.example.service.authentication.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,11 +24,15 @@ public class TrainingService {
     private final TrainingDao trainingDao;
     private final TraineeDao traineeDao;
     private final TrainerDao trainerDao;
+    private final TrainingTypeDao trainingTypeDao;
+    private final AuthenticationService authenticationService;
 
-    public TrainingService(TrainingDao trainingDao, TraineeDao traineeDao, TrainerDao trainerDao) {
+    public TrainingService(TrainingDao trainingDao, TraineeDao traineeDao, TrainerDao trainerDao, TrainingTypeDao trainingTypeDao, AuthenticationService authenticationService) {
         this.trainingDao = trainingDao;
         this.traineeDao = traineeDao;
         this.trainerDao = trainerDao;
+        this.trainingTypeDao = trainingTypeDao;
+        this.authenticationService = authenticationService;
     }
 
     public Training findById(long id) {
@@ -44,35 +49,131 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training create(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, Integer trainingDuration) {
-        log.debug("Searching for trainee with id={}", traineeId);
-        Trainee trainee = traineeDao.findById(traineeId).orElseThrow(() -> {
-            log.warn("Trainee with id={} was not found", traineeId);
-            return new NoSuchElementException("Trainee with id " + traineeId + " was not found");
-        });
+    public Training create(String authUsername,
+                           String authPassword,
+                           String traineeUsername,
+                           String trainerUsername,
+                           TrainingTypeName trainingTypeName,
+                           String trainingName,
+                           LocalDate trainingDate,
+                           Integer trainingDuration) {
+        authenticationService.requireAuthentication(authUsername, authPassword);
 
-        log.debug("Searching for trainer with id={}", trainerId);
-        Trainer trainer = trainerDao.findById(trainerId).orElseThrow(() -> {
-            log.warn("Trainer with id={} was not found", trainerId);
-            return new NoSuchElementException("Trainee with id " + trainerId + " was not found");
-        });
+        Trainee trainee = traineeDao.findByUsername(traineeUsername).orElseThrow();
+        Trainer trainer = trainerDao.findByUsername(trainerUsername).orElseThrow();
+        TrainingType trainingType = trainingTypeDao.findByName(trainingTypeName).orElseThrow();
 
-        Training savedTraining = trainingDao.save(new Training(
+        return new Training(trainee, trainer, trainingName, trainingType, trainingDate, trainingDuration);
+    }
+
+    public List<Training> getTraineeTrainings(
+            String authUsername,
+            String authPassword,
+            String traineeUsername,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String trainerName,
+            TrainingTypeName trainingType
+    ) {
+        authenticationService.requireAuthentication(
+                authUsername,
+                authPassword
+        );
+
+        if (fromDate != null
+                && toDate != null
+                && fromDate.isAfter(toDate)) {
+            throw new IllegalArgumentException(
+                    "From date cannot be after to date"
+            );
+        }
+
+        return trainingDao.findTraineeTrainings(
+                traineeUsername,
+                fromDate,
+                toDate,
+                trainerName,
+                trainingType
+        );
+    }
+    public List<Training> getTrainerTrainings(
+            String authUsername,
+            String authPassword,
+            String trainerUsername,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String traineeName
+    ) {
+        authenticationService.requireAuthentication(
+                authUsername,
+                authPassword
+        );
+
+        if (fromDate != null
+                && toDate != null
+                && fromDate.isAfter(toDate)) {
+            throw new IllegalArgumentException(
+                    "From date cannot be after to date"
+            );
+        }
+
+        return trainingDao.findTrainerTrainings(
+                trainerUsername,
+                fromDate,
+                toDate,
+                traineeName
+        );
+    }
+
+    @Transactional
+    public Training create(
+            String authUsername,
+            String authPassword,
+            String traineeUsername,
+            String trainerUsername,
+            String trainingName,
+            TrainingTypeName trainingTypeName,
+            LocalDate trainingDate,
+            Integer trainingDuration
+    ) {
+        authenticationService.requireAuthentication(
+                authUsername,
+                authPassword
+        );
+
+        Trainee trainee = traineeDao
+                .findByUsername(traineeUsername)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Trainee not found"
+                        )
+                );
+
+        Trainer trainer = trainerDao
+                .findByUsername(trainerUsername)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Trainer not found"
+                        )
+                );
+
+        TrainingType trainingType = trainingTypeDao
+                .findByName(trainingTypeName)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Training type not found"
+                        )
+                );
+
+        Training training = new Training(
                 trainee,
                 trainer,
                 trainingName,
                 trainingType,
                 trainingDate,
                 trainingDuration
-        ));
-
-        log.info(
-                "Created training id={}, traineeId={}, trainerId={}, name={}",
-                savedTraining.getTrainingId(),
-                savedTraining.getTrainee().getUser().getUserId(),
-                savedTraining.getTrainer().getUser().getUserId(),
-                savedTraining.getTrainingName()
         );
-        return savedTraining;
+
+        return trainingDao.save(training);
     }
 }
