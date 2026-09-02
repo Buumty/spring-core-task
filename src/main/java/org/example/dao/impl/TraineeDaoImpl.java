@@ -3,6 +3,7 @@ package org.example.dao.impl;
 import jakarta.persistence.FindOption;
 import org.example.dao.TraineeDao;
 import org.example.model.Trainee;
+import org.example.model.Training;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -80,5 +81,17 @@ public class TraineeDaoImpl implements TraineeDao {
                         """, Trainee.class)
                 .setParameter("username", username)
                 .uniqueResultOptional();
+    }
+
+    @Override
+    public void deleteByUsername(String username) {
+        sessionFactory
+                .getCurrentSession()
+                .createMutationQuery("""
+                    DELETE FROM Trainee t
+                    WHERE t.user.username = :username
+                    """)
+                .setParameter("username", username)
+                .executeUpdate();
     }
 }

@@ -13,4 +13,5 @@ public interface TraineeDao {
     List<Trainee> findAll();
     boolean existsByUsername(String username);
     Optional<Trainee> findByUsername(String username);
+    void deleteByUsername(String username);
 }

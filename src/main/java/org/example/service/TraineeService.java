@@ -34,15 +34,16 @@ public class TraineeService {
         this.authenticationService = authenticationService;
     }
 
-    public Trainee findById(long id) {
+    public Trainee findById(long id, String username, String password) {
+        authenticationService.requireTraineeAuthentication(username, password);
         log.debug("Searching for trainee with id={}", id);
-        return traineeDao.findById(id).orElseThrow(() -> {
-            log.warn("Trainee with id={} was not found", id);
-            return new NoSuchElementException("Trainee with id " + id + " was not found");
-        });
+        return traineeDao.findById(id).orElseThrow(() -> new NoSuchElementException(
+                "Trainee with id " + id + " not found"
+        ));
     }
 
-    public List<Trainee> findAll() {
+    public List<Trainee> findAll(String username, String password) {
+        authenticationService.requireTraineeAuthentication(username, password);
         log.debug("Retrieving all trainees");
         return traineeDao.findAll();
     }
@@ -82,31 +83,28 @@ public class TraineeService {
             String firstName,
             String lastName,
             String address,
-            long id,
             String username,
             String password
     ) {
         authenticationService.requireTraineeAuthentication(username,password);
-        Trainee traineeFromDB = findById(id);
+        Trainee trainee = getByUsername(username);
 
-        traineeFromDB.getUser().setFirstName(firstName);
-        traineeFromDB.getUser().setLastName(lastName);
-        traineeFromDB.setAddress(address);
+        trainee.getUser().setFirstName(firstName);
+        trainee.getUser().setLastName(lastName);
+        trainee.setAddress(address);
 
-        Trainee updatedTrainee = traineeDao.update(traineeFromDB);
+        log.info("Updated trainee username={}", username);
 
-        log.info("Updated trainee id={}", id);
-
-        return updatedTrainee;
+        return trainee;
     }
 
     @Transactional
-    public void deleteById(long id, String username, String password) {
+    public void deleteByUsername(String username, String password) {
         authenticationService.requireTraineeAuthentication(username,password);
-        findById(id);
-        traineeDao.deleteById(id);
 
-        log.info("Deleted trainee id={}", id);
+        traineeDao.deleteByUsername(username);
+
+        log.info("Deleted trainee username={}", username);
     }
 
     @Transactional
@@ -121,8 +119,7 @@ public class TraineeService {
                         oldPassword
                 );
 
-        Trainee trainee =
-                traineeDao.findByUsername(username).orElseThrow();
+        Trainee trainee = getByUsername(username);
 
         trainee.getUser().setPassword(newPassword);
     }
@@ -131,7 +128,7 @@ public class TraineeService {
     public void activate(String username, String password) {
         authenticationService.requireTraineeAuthentication(username,password);
 
-        Trainee trainee = traineeDao.findByUsername(username).orElseThrow();
+        Trainee trainee = getByUsername(username);
 
         if (trainee.getUser().isActive()) {
             throw new IllegalStateException(
@@ -146,7 +143,7 @@ public class TraineeService {
     public void deactivate(String username, String password) {
         authenticationService.requireTraineeAuthentication(username,password);
 
-        Trainee trainee = traineeDao.findByUsername(username).orElseThrow();
+        Trainee trainee = getByUsername(username);
 
         if (!trainee.getUser().isActive()) {
             throw new IllegalStateException(
@@ -155,5 +152,21 @@ public class TraineeService {
         }
 
         trainee.getUser().setActive(false);
+    }
+
+    public Trainee findByUsername(String username, String password) {
+        authenticationService.requireTraineeAuthentication(username, password);
+
+        return getByUsername(username);
+
+
+    }
+
+    private Trainee getByUsername(String username) {
+        return traineeDao.findByUsername(username)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Trainee with username " + username + " not found"
+                        ));
     }
 }
