@@ -2,7 +2,10 @@ package org.example.service;
 
 import org.example.dao.TrainerDao;
 import org.example.dao.TrainingTypeDao;
-import org.example.model.*;
+import org.example.model.Trainer;
+import org.example.model.TrainingType;
+import org.example.model.TrainingTypeName;
+import org.example.model.User;
 import org.example.service.authentication.AuthenticationService;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
@@ -13,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +37,8 @@ public class TrainerService {
         this.authenticationService = authenticationService;
     }
 
-    public Trainer findById(long id) {
+    public Trainer findById(long id, String username, String password) {
+        authenticationService.requireTrainerAuthentication(username,password);
         log.debug("Searching for trainer with id={}", id);
         return trainerDao.findById(id).orElseThrow(() -> {
             log.warn("Trainer with id={} was not found", id);
@@ -43,7 +46,8 @@ public class TrainerService {
         });
     }
 
-    public List<Trainer> findAll() {
+    public List<Trainer> findAll(String username, String password) {
+        authenticationService.requireTrainerAuthentication(username,password);
         log.debug("Retrieving all trainers");
         return trainerDao.findAll();
     }
@@ -56,7 +60,11 @@ public class TrainerService {
                 passwordGenerator.generate(),
                 true);
 
-        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow();
+        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow(() ->
+                new NoSuchElementException(
+                        "Training type " + specialization + " not found"
+                ));
+
 
         Trainer savedTrainer = trainerDao.save(new Trainer(trainingType,
                 user));
@@ -65,7 +73,7 @@ public class TrainerService {
 
         log.info(
                 "Created trainer id={}, username={}",
-                savedTrainer.getUser().getUserId(),
+                savedTrainer.getTrainerId(),
                 savedTrainer.getUser().getUsername()
         );
 
@@ -77,24 +85,24 @@ public class TrainerService {
             String firstName,
             String lastName,
             TrainingTypeName specialization,
-            long id,
             String username,
             String password
     ) {
         authenticationService.requireTrainerAuthentication(username,password);
-        Trainer trainerFromDB = findById(id);
+        Trainer trainer = getByUsername(username);
 
-        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow();
+        TrainingType trainingType = trainingTypeDao.findByName(specialization).orElseThrow(() ->
+                new NoSuchElementException(
+                        "Training type " + specialization + " not found"
+                ));
 
-        trainerFromDB.getUser().setFirstName(firstName);
-        trainerFromDB.getUser().setLastName(lastName);
-        trainerFromDB.setSpecialization(trainingType);
+        trainer.getUser().setFirstName(firstName);
+        trainer.getUser().setLastName(lastName);
+        trainer.setSpecialization(trainingType);
 
-        Trainer updatedTrainer = trainerDao.update(trainerFromDB);
+        log.info("Updated trainer username={}", username);
 
-        log.info("Updated trainer id={}", id);
-
-        return updatedTrainer;
+        return trainer;
     }
 
     @Transactional
@@ -103,14 +111,9 @@ public class TrainerService {
             String oldPassword,
             String newPassword
     ) {
-        authenticationService
-                .requireTrainerAuthentication(
-                        username,
-                        oldPassword
-                );
+        authenticationService.requireTrainerAuthentication(username, oldPassword);
 
-        Trainer trainer =
-                trainerDao.findByUsername(username).orElseThrow();
+        Trainer trainer = getByUsername(username);
 
         trainer.getUser().setPassword(newPassword);
     }
@@ -119,7 +122,7 @@ public class TrainerService {
     public void activate(String username, String password) {
         authenticationService.requireTrainerAuthentication(username,password);
 
-        Trainer trainer = trainerDao.findByUsername(username).orElseThrow();
+        Trainer trainer = getByUsername(username);
 
         if (trainer.getUser().isActive()) {
             throw new IllegalStateException(
@@ -134,7 +137,7 @@ public class TrainerService {
     public void deactivate(String username, String password) {
         authenticationService.requireTrainerAuthentication(username,password);
 
-        Trainer trainer = trainerDao.findByUsername(username).orElseThrow();
+        Trainer trainer = getByUsername(username);
 
         if (!trainer.getUser().isActive()) {
             throw new IllegalStateException(
@@ -143,5 +146,19 @@ public class TrainerService {
         }
 
         trainer.getUser().setActive(false);
+    }
+
+    public Trainer findByUsername(String username, String password) {
+        authenticationService.requireTrainerAuthentication(username,password);
+
+        return getByUsername(username);
+    }
+
+    private Trainer getByUsername(String username) {
+        return trainerDao.findByUsername(username)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Trainer with username " + username + " not found"
+                        ));
     }
 }
