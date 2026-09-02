@@ -1,7 +1,5 @@
 package org.example.dao;
 
-import org.example.model.Trainee;
-import org.example.model.Trainer;
 import org.example.model.Training;
 import org.example.model.TrainingTypeName;
 
@@ -26,5 +24,4 @@ public interface TrainingDao {
             LocalDate toDate,
             String traineeName
     );
-    List<Trainer> getUnassignedTrainers();
 }

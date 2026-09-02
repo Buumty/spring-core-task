@@ -48,24 +48,6 @@ public class TrainingService {
         return trainingDao.findAll();
     }
 
-    @Transactional
-    public Training create(String authUsername,
-                           String authPassword,
-                           String traineeUsername,
-                           String trainerUsername,
-                           TrainingTypeName trainingTypeName,
-                           String trainingName,
-                           LocalDate trainingDate,
-                           Integer trainingDuration) {
-        authenticationService.requireAuthentication(authUsername, authPassword);
-
-        Trainee trainee = traineeDao.findByUsername(traineeUsername).orElseThrow();
-        Trainer trainer = trainerDao.findByUsername(trainerUsername).orElseThrow();
-        TrainingType trainingType = trainingTypeDao.findByName(trainingTypeName).orElseThrow();
-
-        return new Training(trainee, trainer, trainingName, trainingType, trainingDate, trainingDuration);
-    }
-
     public List<Training> getTraineeTrainings(
             String authUsername,
             String authPassword,

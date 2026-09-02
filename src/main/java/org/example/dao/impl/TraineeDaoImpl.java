@@ -84,14 +84,9 @@ public class TraineeDaoImpl implements TraineeDao {
     }
 
     @Override
-    public void deleteByUsername(String username) {
+    public void delete(Trainee trainee) {
         sessionFactory
                 .getCurrentSession()
-                .createMutationQuery("""
-                    DELETE FROM Trainee t
-                    WHERE t.user.username = :username
-                    """)
-                .setParameter("username", username)
-                .executeUpdate();
+                .remove(trainee);
     }
 }

@@ -3,7 +3,6 @@ package org.example.facade;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.example.model.Training;
-import org.example.model.TrainingType;
 import org.example.model.TrainingTypeName;
 import org.example.service.TraineeService;
 import org.example.service.TrainerService;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class GymFacade {
@@ -44,8 +44,39 @@ public class GymFacade {
         );
     }
 
+    public Trainee findTraineeByUsername(
+            String username,
+            String password
+    ) {
+        return traineeService.findByUsername(
+                username,
+                password
+        );
+    }
+
+    public Trainee findTraineeById(
+            long id,
+            String username,
+            String password
+    ) {
+        return traineeService.findById(
+                id,
+                username,
+                password
+        );
+    }
+
+    public List<Trainee> findAllTrainees(
+            String username,
+            String password
+    ) {
+        return traineeService.findAll(
+                username,
+                password
+        );
+    }
+
     public Trainee updateTrainee(
-            long traineeId,
             String firstName,
             String lastName,
             String address,
@@ -56,30 +87,19 @@ public class GymFacade {
                 firstName,
                 lastName,
                 address,
-                traineeId,
                 username,
                 password
         );
     }
 
     public void deleteTrainee(
-            long traineeId,
             String username,
             String password
     ) {
-        traineeService.deleteById(
-                traineeId,
+        traineeService.deleteByUsername(
                 username,
                 password
         );
-    }
-
-    public Trainee findTraineeById(long traineeId) {
-        return traineeService.findById(traineeId);
-    }
-
-    public List<Trainee> findAllTrainees() {
-        return traineeService.findAll();
     }
 
     public void changeTraineePassword(
@@ -114,6 +134,18 @@ public class GymFacade {
         );
     }
 
+    public Trainee updateTraineeTrainers(
+            String username,
+            String password,
+            Set<String> trainerUsernames
+    ) {
+        return traineeService.updateTrainers(
+                username,
+                password,
+                trainerUsernames
+        );
+    }
+
     public Trainer createTrainer(
             String firstName,
             String lastName,
@@ -126,8 +158,39 @@ public class GymFacade {
         );
     }
 
+    public Trainer findTrainerByUsername(
+            String username,
+            String password
+    ) {
+        return trainerService.findByUsername(
+                username,
+                password
+        );
+    }
+
+    public Trainer findTrainerById(
+            long id,
+            String username,
+            String password
+    ) {
+        return trainerService.findById(
+                id,
+                username,
+                password
+        );
+    }
+
+    public List<Trainer> findAllTrainers(
+            String username,
+            String password
+    ) {
+        return trainerService.findAll(
+                username,
+                password
+        );
+    }
+
     public Trainer updateTrainer(
-            long trainerId,
             String firstName,
             String lastName,
             TrainingTypeName specialization,
@@ -138,18 +201,9 @@ public class GymFacade {
                 firstName,
                 lastName,
                 specialization,
-                trainerId,
                 username,
                 password
         );
-    }
-
-    public Trainer findTrainerById(long trainerId) {
-        return trainerService.findById(trainerId);
-    }
-
-    public List<Trainer> findAllTrainers() {
-        return trainerService.findAll();
     }
 
     public void changeTrainerPassword(
@@ -184,17 +238,32 @@ public class GymFacade {
         );
     }
 
+    public List<Trainer> findTrainersNotAssignedToTrainee(
+            String traineeUsername,
+            String password
+    ) {
+        return trainerService.findNotAssignedToTrainee(
+                traineeUsername,
+                password
+        );
+    }
+
+
     public Training createTraining(
-            long traineeId,
-            long trainerId,
+            String authUsername,
+            String authPassword,
+            String traineeUsername,
+            String trainerUsername,
             String trainingName,
-            TrainingType trainingType,
+            TrainingTypeName trainingType,
             LocalDate trainingDate,
             Integer trainingDuration
     ) {
         return trainingService.create(
-                traineeId,
-                trainerId,
+                authUsername,
+                authPassword,
+                traineeUsername,
+                trainerUsername,
                 trainingName,
                 trainingType,
                 trainingDate,
@@ -202,11 +271,41 @@ public class GymFacade {
         );
     }
 
-    public Training findTrainingById(long trainingId) {
-        return trainingService.findById(trainingId);
+    public List<Training> getTraineeTrainings(
+            String authUsername,
+            String authPassword,
+            String traineeUsername,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String trainerName,
+            TrainingTypeName trainingType
+    ) {
+        return trainingService.getTraineeTrainings(
+                authUsername,
+                authPassword,
+                traineeUsername,
+                fromDate,
+                toDate,
+                trainerName,
+                trainingType
+        );
     }
 
-    public List<Training> findAllTrainings() {
-        return trainingService.findAll();
+    public List<Training> getTrainerTrainings(
+            String authUsername,
+            String authPassword,
+            String trainerUsername,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String traineeName
+    ) {
+        return trainingService.getTrainerTrainings(
+                authUsername,
+                authPassword,
+                trainerUsername,
+                fromDate,
+                toDate,
+                traineeName
+        );
     }
 }

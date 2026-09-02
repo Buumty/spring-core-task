@@ -104,12 +104,21 @@ public class TraineeService {
     }
 
     @Transactional
-    public void deleteByUsername(String username, String password) {
-        authenticationService.requireTraineeAuthentication(username,password);
+    public void deleteByUsername(
+            String username,
+            String password
+    ) {
+        authenticationService
+                .requireTraineeAuthentication(username, password);
 
-        traineeDao.deleteByUsername(username);
+        Trainee trainee = getByUsername(username);
 
-        log.info("Deleted trainee username={}", username);
+        traineeDao.delete(trainee);
+
+        log.info(
+                "Deleted trainee username={}",
+                username
+        );
     }
 
     @Transactional

@@ -19,7 +19,7 @@ public class TrainingType {
     )
     private TrainingTypeName trainingTypeName;
 
-    private TrainingType() {}
+    protected TrainingType() {}
 
     public TrainingType(TrainingTypeName trainingTypeName) {
         this.trainingTypeName = trainingTypeName;
