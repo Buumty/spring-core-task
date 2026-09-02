@@ -70,4 +70,26 @@ public class TrainerDaoImpl implements TrainerDao {
                 .setParameter("username", username)
                 .uniqueResultOptional();
     }
+    @Override
+    public List<Trainer> findNotAssignedToTrainee(
+            String traineeUsername
+    ) {
+        return sessionFactory
+                .getCurrentSession()
+                .createQuery("""
+                    SELECT tr
+                    FROM Trainer tr
+                    WHERE tr NOT IN (
+                        SELECT assignedTrainer
+                        FROM Trainee t
+                        JOIN t.trainers assignedTrainer
+                        WHERE t.user.username = :traineeUsername
+                    )
+                    """, Trainer.class)
+                .setParameter(
+                        "traineeUsername",
+                        traineeUsername
+                )
+                .getResultList();
+    }
 }

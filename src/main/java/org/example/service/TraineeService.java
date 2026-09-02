@@ -1,7 +1,9 @@
 package org.example.service;
 
 import org.example.dao.TraineeDao;
+import org.example.dao.TrainerDao;
 import org.example.model.Trainee;
+import org.example.model.Trainer;
 import org.example.model.User;
 import org.example.service.authentication.AuthenticationService;
 import org.example.service.generator.PasswordGenerator;
@@ -22,13 +24,15 @@ public class TraineeService {
             LoggerFactory.getLogger(TraineeService.class);
 
     private final TraineeDao traineeDao;
+    private final TrainerDao trainerDao;
     private final PasswordGenerator passwordGenerator;
     private final UsernameGenerator usernameGenerator;
     private final AuthenticationService authenticationService;
 
 
-    public TraineeService(TraineeDao traineeDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
+    public TraineeService(TraineeDao traineeDao, TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
         this.traineeDao = traineeDao;
+        this.trainerDao = trainerDao;
         this.passwordGenerator = passwordGenerator;
         this.usernameGenerator = usernameGenerator;
         this.authenticationService = authenticationService;
@@ -153,6 +157,7 @@ public class TraineeService {
 
         trainee.getUser().setActive(false);
     }
+
 
     public Trainee findByUsername(String username, String password) {
         authenticationService.requireTraineeAuthentication(username, password);
