@@ -46,6 +46,14 @@ public class Trainee {
     )
     private Set<Trainer> trainers = new HashSet<>();
 
+    public Set<Trainer> getTrainers() {
+        return trainers;
+    }
+
+    public void setTrainers(Set<Trainer> trainers) {
+        this.trainers = trainers;
+    }
+
     protected Trainee(){}
 
 

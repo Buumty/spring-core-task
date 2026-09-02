@@ -147,19 +147,18 @@ public class TrainerService {
 
         trainer.getUser().setActive(false);
     }
-
-    public List<Trainer> getUnassignedTrainers(
-            String username,
+    public List<Trainer> findNotAssignedToTrainee(
+            String traineeUsername,
             String password
     ) {
-        authenticationService
-                .requireTraineeAuthentication(
-                        username,
-                        password
-                );
+        authenticationService.requireTraineeAuthentication(
+                traineeUsername,
+                password
+        );
 
-        return trainerDao
-                .findNotAssignedToTrainee(username);
+        return trainerDao.findNotAssignedToTrainee(
+                traineeUsername
+        );
     }
 
     public Trainer findByUsername(String username, String password) {

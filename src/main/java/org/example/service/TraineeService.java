@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -156,6 +157,56 @@ public class TraineeService {
         }
 
         trainee.getUser().setActive(false);
+    }
+
+    @Transactional
+    public Trainee updateTrainers(
+            String username,
+            String password,
+            Set<String> trainerUsernames
+    ) {
+        authenticationService.requireTraineeAuthentication(
+                username,
+                password
+        );
+
+        Trainee trainee = getByUsername(username);
+
+        if (trainerUsernames == null) {
+            throw new IllegalArgumentException(
+                    "Trainer usernames cannot be null"
+            );
+        }
+
+        if (trainerUsernames.isEmpty()) {
+            trainee.getTrainers().clear();
+
+            log.info(
+                    "Removed all trainers from trainee username={}",
+                    username
+            );
+
+            return trainee;
+        }
+
+        List<Trainer> trainers =
+                trainerDao.findByUsernames(trainerUsernames);
+
+        if (trainers.size() != trainerUsernames.size()) {
+            throw new NoSuchElementException(
+                    "One or more trainers were not found"
+            );
+        }
+
+        trainee.getTrainers().clear();
+        trainee.getTrainers().addAll(trainers);
+
+        log.info(
+                "Updated trainers list for trainee username={}",
+                username
+        );
+
+        return trainee;
     }
 
 

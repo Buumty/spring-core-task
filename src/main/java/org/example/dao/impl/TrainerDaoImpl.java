@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class TrainerDaoImpl implements TrainerDao {
@@ -90,6 +91,17 @@ public class TrainerDaoImpl implements TrainerDao {
                         "traineeUsername",
                         traineeUsername
                 )
+                .getResultList();
+    }
+    @Override
+    public List<Trainer> findByUsernames(Set<String> usernames) {
+        return sessionFactory
+                .getCurrentSession()
+                .createQuery("""
+                    FROM Trainer t
+                    WHERE t.user.username IN :usernames
+                    """, Trainer.class)
+                .setParameterList("usernames", usernames)
                 .getResultList();
     }
 }
