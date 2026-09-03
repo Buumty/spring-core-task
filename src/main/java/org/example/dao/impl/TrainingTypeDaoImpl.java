@@ -20,6 +20,11 @@ public class TrainingTypeDaoImpl implements TrainingTypeDao {
     }
 
     @Override
+    public void save(TrainingType trainingType) {
+        sessionFactory.getCurrentSession().persist(trainingType);
+    }
+
+    @Override
     public Optional<TrainingType> findByName(
             TrainingTypeName name
     ) {
