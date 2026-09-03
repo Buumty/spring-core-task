@@ -1,5 +1,7 @@
 package org.example.service;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.example.dao.TrainerDao;
 import org.example.dao.TrainingTypeDao;
 import org.example.model.Trainer;
@@ -53,7 +55,10 @@ public class TrainerService {
     }
 
     @Transactional
-    public Trainer create(String firstName, String lastName, TrainingTypeName specialization) {
+    public Trainer create(
+            @NotBlank String firstName,
+            @NotBlank String lastName,
+            @NotNull TrainingTypeName specialization) {
         User user = new User(firstName,
                 lastName,
                 usernameGenerator.generate(firstName, lastName),

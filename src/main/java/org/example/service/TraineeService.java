@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.validation.constraints.NotBlank;
 import org.example.dao.TraineeDao;
 import org.example.dao.TrainerDao;
 import org.example.model.Trainee;
@@ -12,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Service
+@Validated
 @Transactional(readOnly = true)
 public class TraineeService {
     private static final Logger log =
@@ -31,7 +35,7 @@ public class TraineeService {
     private final AuthenticationService authenticationService;
 
 
-    public TraineeService(TraineeDao traineeDao, TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
+    public TraineeService(TraineeDao traineeDao, TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService, MethodValidationPostProcessor methodValidationPostProcessor) {
         this.traineeDao = traineeDao;
         this.trainerDao = trainerDao;
         this.passwordGenerator = passwordGenerator;
@@ -55,8 +59,8 @@ public class TraineeService {
 
     @Transactional
     public Trainee create(
-            String firstName,
-            String lastName,
+            @NotBlank String firstName,
+            @NotBlank String lastName,
             LocalDate dateOfBirth,
             String address
     ) {
@@ -85,11 +89,11 @@ public class TraineeService {
 
     @Transactional
     public Trainee update(
-            String firstName,
-            String lastName,
+            @NotBlank String firstName,
+            @NotBlank String lastName,
             String address,
-            String username,
-            String password
+            @NotBlank String username,
+            @NotBlank String password
     ) {
         authenticationService.requireTraineeAuthentication(username,password);
         Trainee trainee = getByUsername(username);

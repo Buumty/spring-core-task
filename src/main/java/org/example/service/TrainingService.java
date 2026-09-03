@@ -1,5 +1,8 @@
 package org.example.service;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.example.dao.TraineeDao;
 import org.example.dao.TrainerDao;
 import org.example.dao.TrainingDao;
@@ -109,14 +112,14 @@ public class TrainingService {
 
     @Transactional
     public Training create(
-            String authUsername,
-            String authPassword,
-            String traineeUsername,
-            String trainerUsername,
-            String trainingName,
-            TrainingTypeName trainingTypeName,
-            LocalDate trainingDate,
-            Integer trainingDuration
+            @NotBlank String authUsername,
+            @NotBlank String authPassword,
+            @NotBlank String traineeUsername,
+            @NotBlank String trainerUsername,
+            @NotBlank String trainingName,
+            @NotNull TrainingTypeName trainingTypeName,
+            @NotNull LocalDate trainingDate,
+            @NotNull @Positive Integer trainingDuration
     ) {
         authenticationService.requireAuthentication(
                 authUsername,
