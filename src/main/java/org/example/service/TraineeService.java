@@ -35,7 +35,7 @@ public class TraineeService {
     private final AuthenticationService authenticationService;
 
 
-    public TraineeService(TraineeDao traineeDao, TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService, MethodValidationPostProcessor methodValidationPostProcessor) {
+    public TraineeService(TraineeDao traineeDao, TrainerDao trainerDao, PasswordGenerator passwordGenerator, UsernameGenerator usernameGenerator, AuthenticationService authenticationService) {
         this.traineeDao = traineeDao;
         this.trainerDao = trainerDao;
         this.passwordGenerator = passwordGenerator;
