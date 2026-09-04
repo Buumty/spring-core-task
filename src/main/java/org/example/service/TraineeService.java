@@ -92,6 +92,7 @@ public class TraineeService {
             @NotBlank String firstName,
             @NotBlank String lastName,
             String address,
+            LocalDate dateOfBirth,
             @NotBlank String username,
             @NotBlank String password
     ) {
@@ -101,6 +102,7 @@ public class TraineeService {
         trainee.getUser().setFirstName(firstName);
         trainee.getUser().setLastName(lastName);
         trainee.setAddress(address);
+        trainee.setDateOfBirth(dateOfBirth);
 
         log.info("Updated trainee username={}", username);
 

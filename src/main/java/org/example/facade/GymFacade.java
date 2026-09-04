@@ -80,6 +80,7 @@ public class GymFacade {
             String firstName,
             String lastName,
             String address,
+            LocalDate dateOfBirth,
             String username,
             String password
     ) {
@@ -87,6 +88,7 @@ public class GymFacade {
                 firstName,
                 lastName,
                 address,
+                dateOfBirth,
                 username,
                 password
         );

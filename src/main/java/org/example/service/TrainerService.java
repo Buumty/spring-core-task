@@ -15,11 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@Validated
 @Transactional(readOnly = true)
 public class TrainerService {
     private static final Logger log =
@@ -87,11 +89,11 @@ public class TrainerService {
 
     @Transactional
     public Trainer update(
-            String firstName,
-            String lastName,
-            TrainingTypeName specialization,
-            String username,
-            String password
+            @NotBlank String firstName,
+            @NotBlank String lastName,
+            @NotNull TrainingTypeName specialization,
+            @NotBlank String username,
+            @NotBlank String password
     ) {
         authenticationService.requireTrainerAuthentication(username,password);
         Trainer trainer = getByUsername(username);
