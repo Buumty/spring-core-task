@@ -1,4 +1,5 @@
 package facade;
+
 import org.example.facade.GymFacade;
 import org.example.model.Trainee;
 import org.example.model.Trainer;
@@ -13,14 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GymFacadeTest {
@@ -37,10 +36,16 @@ class GymFacadeTest {
     @InjectMocks
     private GymFacade gymFacade;
 
+    // =========================
+    // TRAINEE
+    // =========================
+
     @Test
     void shouldCreateTrainee() {
-        LocalDate dateOfBirth = LocalDate.of(1995, 5, 10);
-        Trainee trainee = createTrainee();
+        Trainee trainee = mock(Trainee.class);
+
+        LocalDate dateOfBirth =
+                LocalDate.of(1995, 5, 10);
 
         when(traineeService.create(
                 "John",
@@ -67,23 +72,103 @@ class GymFacadeTest {
     }
 
     @Test
+    void shouldFindTraineeByUsername() {
+        Trainee trainee = mock(Trainee.class);
+
+        when(traineeService.findByUsername(
+                "John.Smith",
+                "password"
+        )).thenReturn(trainee);
+
+        Trainee result =
+                gymFacade.findTraineeByUsername(
+                        "John.Smith",
+                        "password"
+                );
+
+        assertSame(trainee, result);
+
+        verify(traineeService).findByUsername(
+                "John.Smith",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldFindTraineeById() {
+        Trainee trainee = mock(Trainee.class);
+
+        when(traineeService.findById(
+                1L,
+                "John.Smith",
+                "password"
+        )).thenReturn(trainee);
+
+        Trainee result = gymFacade.findTraineeById(
+                1L,
+                "John.Smith",
+                "password"
+        );
+
+        assertSame(trainee, result);
+
+        verify(traineeService).findById(
+                1L,
+                "John.Smith",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldFindAllTrainees() {
+        List<Trainee> trainees =
+                List.of(
+                        mock(Trainee.class),
+                        mock(Trainee.class)
+                );
+
+        when(traineeService.findAll(
+                "John.Smith",
+                "password"
+        )).thenReturn(trainees);
+
+        List<Trainee> result =
+                gymFacade.findAllTrainees(
+                        "John.Smith",
+                        "password"
+                );
+
+        assertSame(trainees, result);
+
+        verify(traineeService).findAll(
+                "John.Smith",
+                "password"
+        );
+    }
+
+    @Test
     void shouldUpdateTrainee() {
-        Trainee trainee = createTrainee();
+        Trainee trainee = mock(Trainee.class);
+
+        LocalDate dateOfBirth =
+                LocalDate.of(1996, 6, 15);
 
         when(traineeService.update(
                 "Jonathan",
                 "Johnson",
                 "New address",
-                false,
-                1L
+                dateOfBirth,
+                "John.Smith",
+                "password"
         )).thenReturn(trainee);
 
         Trainee result = gymFacade.updateTrainee(
-                1L,
                 "Jonathan",
                 "Johnson",
                 "New address",
-                false
+                dateOfBirth,
+                "John.Smith",
+                "password"
         );
 
         assertSame(trainee, result);
@@ -92,262 +177,435 @@ class GymFacadeTest {
                 "Jonathan",
                 "Johnson",
                 "New address",
-                false,
-                1L
+                dateOfBirth,
+                "John.Smith",
+                "password"
         );
     }
 
     @Test
     void shouldDeleteTrainee() {
-        gymFacade.deleteTrainee(1L);
-
-        verify(traineeService).deleteById(1L);
-    }
-
-    @Test
-    void shouldFindTraineeById() {
-        Trainee trainee = createTrainee();
-
-        when(traineeService.findById(1L))
-                .thenReturn(trainee);
-
-        Trainee result = gymFacade.findTraineeById(1L);
-
-        assertSame(trainee, result);
-        verify(traineeService).findById(1L);
-    }
-
-    @Test
-    void shouldReturnAllTrainees() {
-        List<Trainee> trainees = List.of(
-                createTrainee(),
-                new Trainee(
-                        2L,
-                        "Anna",
-                        "Brown",
-                        "Anna.Brown",
-                        "Password2",
-                        true,
-                        LocalDate.of(2000, 10, 11),
-                        "Second address"
-                )
+        gymFacade.deleteTrainee(
+                "John.Smith",
+                "password"
         );
 
-        when(traineeService.findAll())
-                .thenReturn(trainees);
-
-        List<Trainee> result = gymFacade.findAllTrainees();
-
-        assertSame(trainees, result);
-        assertEquals(2, result.size());
-
-        verify(traineeService).findAll();
+        verify(traineeService).deleteByUsername(
+                "John.Smith",
+                "password"
+        );
     }
+
+    @Test
+    void shouldChangeTraineePassword() {
+        gymFacade.changeTraineePassword(
+                "John.Smith",
+                "oldPassword",
+                "newPassword"
+        );
+
+        verify(traineeService).changePassword(
+                "John.Smith",
+                "oldPassword",
+                "newPassword"
+        );
+    }
+
+    @Test
+    void shouldActivateTrainee() {
+        gymFacade.activateTrainee(
+                "John.Smith",
+                "password"
+        );
+
+        verify(traineeService).activate(
+                "John.Smith",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldDeactivateTrainee() {
+        gymFacade.deactivateTrainee(
+                "John.Smith",
+                "password"
+        );
+
+        verify(traineeService).deactivate(
+                "John.Smith",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldUpdateTraineeTrainers() {
+        Trainee trainee = mock(Trainee.class);
+
+        Set<String> trainerUsernames =
+                Set.of(
+                        "Anna.Brown",
+                        "Mike.Jones"
+                );
+
+        when(traineeService.updateTrainers(
+                "John.Smith",
+                "password",
+                trainerUsernames
+        )).thenReturn(trainee);
+
+        Trainee result =
+                gymFacade.updateTraineeTrainers(
+                        "John.Smith",
+                        "password",
+                        trainerUsernames
+                );
+
+        assertSame(trainee, result);
+
+        verify(traineeService).updateTrainers(
+                "John.Smith",
+                "password",
+                trainerUsernames
+        );
+    }
+
+    // =========================
+    // TRAINER
+    // =========================
 
     @Test
     void shouldCreateTrainer() {
-        Trainer trainer = createTrainer();
+        Trainer trainer = mock(Trainer.class);
 
         when(trainerService.create(
-                "John",
-                "Smith",
+                "Anna",
+                "Brown",
                 TrainingTypeName.STRENGTH
         )).thenReturn(trainer);
 
         Trainer result = gymFacade.createTrainer(
-                "John",
-                "Smith",
+                "Anna",
+                "Brown",
                 TrainingTypeName.STRENGTH
         );
 
         assertSame(trainer, result);
 
         verify(trainerService).create(
-                "John",
-                "Smith",
+                "Anna",
+                "Brown",
                 TrainingTypeName.STRENGTH
         );
     }
 
     @Test
-    void shouldUpdateTrainer() {
-        Trainer trainer = createTrainer();
+    void shouldFindTrainerByUsername() {
+        Trainer trainer = mock(Trainer.class);
 
-        when(trainerService.update(
-                "Jonathan",
-                "Johnson",
-                false,
-                TrainingTypeName.CARDIO,
-                1L
+        when(trainerService.findByUsername(
+                "Anna.Brown",
+                "password"
         )).thenReturn(trainer);
 
-        Trainer result = gymFacade.updateTrainer(
-                1L,
-                "Jonathan",
-                "Johnson",
-                false,
-                TrainingTypeName.CARDIO
-        );
+        Trainer result =
+                gymFacade.findTrainerByUsername(
+                        "Anna.Brown",
+                        "password"
+                );
 
         assertSame(trainer, result);
 
-        verify(trainerService).update(
-                "Jonathan",
-                "Johnson",
-                false,
-                TrainingTypeName.CARDIO,
-                1L
+        verify(trainerService).findByUsername(
+                "Anna.Brown",
+                "password"
         );
     }
 
     @Test
     void shouldFindTrainerById() {
-        Trainer trainer = createTrainer();
+        Trainer trainer = mock(Trainer.class);
 
-        when(trainerService.findById(1L))
-                .thenReturn(trainer);
+        when(trainerService.findById(
+                1L,
+                "Anna.Brown",
+                "password"
+        )).thenReturn(trainer);
 
-        Trainer result = gymFacade.findTrainerById(1L);
+        Trainer result = gymFacade.findTrainerById(
+                1L,
+                "Anna.Brown",
+                "password"
+        );
 
         assertSame(trainer, result);
-        verify(trainerService).findById(1L);
+
+        verify(trainerService).findById(
+                1L,
+                "Anna.Brown",
+                "password"
+        );
     }
 
     @Test
-    void shouldReturnAllTrainers() {
-        List<Trainer> trainers = List.of(
-                createTrainer(),
-                new Trainer(
-                        2L,
-                        "Anna",
-                        "Brown",
+    void shouldFindAllTrainers() {
+        List<Trainer> trainers =
+                List.of(
+                        mock(Trainer.class),
+                        mock(Trainer.class)
+                );
+
+        when(trainerService.findAll(
+                "Anna.Brown",
+                "password"
+        )).thenReturn(trainers);
+
+        List<Trainer> result =
+                gymFacade.findAllTrainers(
                         "Anna.Brown",
-                        "Password2",
-                        true,
-                        TrainingTypeName.YOGA
-                )
-        );
-
-        when(trainerService.findAll())
-                .thenReturn(trainers);
-
-        List<Trainer> result = gymFacade.findAllTrainers();
+                        "password"
+                );
 
         assertSame(trainers, result);
-        assertEquals(2, result.size());
 
-        verify(trainerService).findAll();
+        verify(trainerService).findAll(
+                "Anna.Brown",
+                "password"
+        );
     }
+
+    @Test
+    void shouldUpdateTrainer() {
+        Trainer trainer = mock(Trainer.class);
+
+        when(trainerService.update(
+                "Anna",
+                "Johnson",
+                TrainingTypeName.CARDIO,
+                "Anna.Brown",
+                "password"
+        )).thenReturn(trainer);
+
+        Trainer result = gymFacade.updateTrainer(
+                "Anna",
+                "Johnson",
+                TrainingTypeName.CARDIO,
+                "Anna.Brown",
+                "password"
+        );
+
+        assertSame(trainer, result);
+
+        verify(trainerService).update(
+                "Anna",
+                "Johnson",
+                TrainingTypeName.CARDIO,
+                "Anna.Brown",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldChangeTrainerPassword() {
+        gymFacade.changeTrainerPassword(
+                "Anna.Brown",
+                "oldPassword",
+                "newPassword"
+        );
+
+        verify(trainerService).changePassword(
+                "Anna.Brown",
+                "oldPassword",
+                "newPassword"
+        );
+    }
+
+    @Test
+    void shouldActivateTrainer() {
+        gymFacade.activateTrainer(
+                "Anna.Brown",
+                "password"
+        );
+
+        verify(trainerService).activate(
+                "Anna.Brown",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldDeactivateTrainer() {
+        gymFacade.deactivateTrainer(
+                "Anna.Brown",
+                "password"
+        );
+
+        verify(trainerService).deactivate(
+                "Anna.Brown",
+                "password"
+        );
+    }
+
+    @Test
+    void shouldFindTrainersNotAssignedToTrainee() {
+        List<Trainer> trainers =
+                List.of(
+                        mock(Trainer.class),
+                        mock(Trainer.class)
+                );
+
+        when(trainerService.findNotAssignedToTrainee(
+                "John.Smith",
+                "password"
+        )).thenReturn(trainers);
+
+        List<Trainer> result =
+                gymFacade.findTrainersNotAssignedToTrainee(
+                        "John.Smith",
+                        "password"
+                );
+
+        assertSame(trainers, result);
+
+        verify(trainerService)
+                .findNotAssignedToTrainee(
+                        "John.Smith",
+                        "password"
+                );
+    }
+
+    // =========================
+    // TRAINING
+    // =========================
 
     @Test
     void shouldCreateTraining() {
-        LocalDate trainingDate = LocalDate.of(2026, 8, 10);
-        Duration trainingDuration = Duration.ofMinutes(60);
-        Training training = createTraining();
+        Training training = mock(Training.class);
+
+        LocalDate trainingDate =
+                LocalDate.of(2026, 8, 10);
 
         when(trainingService.create(
-                10L,
-                20L,
+                "John.Smith",
+                "password",
+                "John.Smith",
+                "Anna.Brown",
                 "Strength training",
                 TrainingTypeName.STRENGTH,
                 trainingDate,
-                trainingDuration
+                60
         )).thenReturn(training);
 
         Training result = gymFacade.createTraining(
-                10L,
-                20L,
+                "John.Smith",
+                "password",
+                "John.Smith",
+                "Anna.Brown",
                 "Strength training",
                 TrainingTypeName.STRENGTH,
                 trainingDate,
-                trainingDuration
+                60
         );
 
         assertSame(training, result);
 
         verify(trainingService).create(
-                10L,
-                20L,
+                "John.Smith",
+                "password",
+                "John.Smith",
+                "Anna.Brown",
                 "Strength training",
                 TrainingTypeName.STRENGTH,
                 trainingDate,
-                trainingDuration
+                60
         );
     }
 
     @Test
-    void shouldFindTrainingById() {
-        Training training = createTraining();
+    void shouldGetTraineeTrainings() {
+        List<Training> trainings =
+                List.of(mock(Training.class));
 
-        when(trainingService.findById(1L))
-                .thenReturn(training);
+        LocalDate fromDate =
+                LocalDate.of(2026, 8, 1);
 
-        Training result = gymFacade.findTrainingById(1L);
+        LocalDate toDate =
+                LocalDate.of(2026, 8, 31);
 
-        assertSame(training, result);
-        verify(trainingService).findById(1L);
-    }
+        when(trainingService.getTraineeTrainings(
+                "John.Smith",
+                "password",
+                "John.Smith",
+                fromDate,
+                toDate,
+                "Anna Brown",
+                TrainingTypeName.STRENGTH
+        )).thenReturn(trainings);
 
-    @Test
-    void shouldReturnAllTrainings() {
-        List<Training> trainings = List.of(
-                createTraining(),
-                new Training(
-                        2L,
-                        11L,
-                        21L,
-                        "Cardio training",
-                        TrainingTypeName.CARDIO,
-                        LocalDate.of(2026, 8, 11),
-                        Duration.ofMinutes(45)
-                )
-        );
-
-        when(trainingService.findAll())
-                .thenReturn(trainings);
-
-        List<Training> result = gymFacade.findAllTrainings();
+        List<Training> result =
+                gymFacade.getTraineeTrainings(
+                        "John.Smith",
+                        "password",
+                        "John.Smith",
+                        fromDate,
+                        toDate,
+                        "Anna Brown",
+                        TrainingTypeName.STRENGTH
+                );
 
         assertSame(trainings, result);
-        assertEquals(2, result.size());
 
-        verify(trainingService).findAll();
+        verify(trainingService)
+                .getTraineeTrainings(
+                        "John.Smith",
+                        "password",
+                        "John.Smith",
+                        fromDate,
+                        toDate,
+                        "Anna Brown",
+                        TrainingTypeName.STRENGTH
+                );
     }
 
-    private Trainee createTrainee() {
-        return new Trainee(
-                1L,
-                "John",
-                "Smith",
-                "John.Smith",
-                "Abc123xyZ9",
-                true,
-                LocalDate.of(1995, 5, 10),
-                "Example address"
-        );
-    }
+    @Test
+    void shouldGetTrainerTrainings() {
+        List<Training> trainings =
+                List.of(mock(Training.class));
 
-    private Trainer createTrainer() {
-        return new Trainer(
-                1L,
-                "John",
-                "Smith",
-                "John.Smith",
-                "Abc123xyZ9",
-                true,
-                TrainingTypeName.STRENGTH
-        );
-    }
+        LocalDate fromDate =
+                LocalDate.of(2026, 8, 1);
 
-    private Training createTraining() {
-        return new Training(
-                1L,
-                10L,
-                20L,
-                "Strength training",
-                TrainingTypeName.STRENGTH,
-                LocalDate.of(2026, 8, 10),
-                Duration.ofMinutes(60)
-        );
+        LocalDate toDate =
+                LocalDate.of(2026, 8, 31);
+
+        when(trainingService.getTrainerTrainings(
+                "Anna.Brown",
+                "password",
+                "Anna.Brown",
+                fromDate,
+                toDate,
+                "John Smith"
+        )).thenReturn(trainings);
+
+        List<Training> result =
+                gymFacade.getTrainerTrainings(
+                        "Anna.Brown",
+                        "password",
+                        "Anna.Brown",
+                        fromDate,
+                        toDate,
+                        "John Smith"
+                );
+
+        assertSame(trainings, result);
+
+        verify(trainingService)
+                .getTrainerTrainings(
+                        "Anna.Brown",
+                        "password",
+                        "Anna.Brown",
+                        fromDate,
+                        toDate,
+                        "John Smith"
+                );
     }
 }

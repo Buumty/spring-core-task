@@ -1,9 +1,13 @@
 package service;
 
 import org.example.dao.TrainerDao;
+import org.example.dao.TrainingTypeDao;
 import org.example.model.Trainer;
+import org.example.model.TrainingType;
 import org.example.model.TrainingTypeName;
+import org.example.model.User;
 import org.example.service.TrainerService;
+import org.example.service.authentication.AuthenticationService;
 import org.example.service.generator.PasswordGenerator;
 import org.example.service.generator.UsernameGenerator;
 import org.junit.jupiter.api.Test;
@@ -26,10 +30,16 @@ class TrainerServiceTest {
     private TrainerDao trainerDao;
 
     @Mock
+    private TrainingTypeDao trainingTypeDao;
+
+    @Mock
     private PasswordGenerator passwordGenerator;
 
     @Mock
     private UsernameGenerator usernameGenerator;
+
+    @Mock
+    private AuthenticationService authenticationService;
 
     @InjectMocks
     private TrainerService trainerService;
@@ -41,21 +51,42 @@ class TrainerServiceTest {
         when(trainerDao.findById(1L))
                 .thenReturn(Optional.of(trainer));
 
-        Trainer result = trainerService.findById(1L);
+        Trainer result = trainerService.findById(
+                1L,
+                "John.Smith",
+                "Abc123xyZ9"
+        );
 
         assertSame(trainer, result);
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
         verify(trainerDao).findById(1L);
     }
 
     @Test
-    void shouldThrowExceptionWhenTrainerDoesNotExist() {
+    void shouldThrowExceptionWhenTrainerDoesNotExistById() {
         when(trainerDao.findById(999L))
                 .thenReturn(Optional.empty());
 
         assertThrows(
                 NoSuchElementException.class,
-                () -> trainerService.findById(999L)
+                () -> trainerService.findById(
+                        999L,
+                        "John.Smith",
+                        "Abc123xyZ9"
+                )
         );
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
 
         verify(trainerDao).findById(999L);
     }
@@ -64,37 +95,59 @@ class TrainerServiceTest {
     void shouldReturnAllTrainers() {
         Trainer first = createTrainer();
 
-        Trainer second = new Trainer(
-                2L,
+        Trainer second = createTrainer(
                 "Anna",
                 "Brown",
                 "Anna.Brown",
-                "Password2",
-                true,
-                TrainingTypeName.YOGA
+                TrainingTypeName.YOGA,
+                true
         );
 
         when(trainerDao.findAll())
                 .thenReturn(List.of(first, second));
 
-        List<Trainer> result = trainerService.findAll();
+        List<Trainer> result =
+                trainerService.findAll(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
 
         assertEquals(2, result.size());
         assertTrue(result.contains(first));
         assertTrue(result.contains(second));
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
 
         verify(trainerDao).findAll();
     }
 
     @Test
     void shouldCreateTrainer() {
-        when(idGenerator.nextUserId()).thenReturn(1L);
-        when(usernameGenerator.generate("John", "Smith"))
-                .thenReturn("John.Smith");
+        TrainingType trainingType =
+                new TrainingType(
+                        TrainingTypeName.STRENGTH
+                );
+
+        when(usernameGenerator.generate(
+                "John",
+                "Smith"
+        )).thenReturn("John.Smith");
+
         when(passwordGenerator.generate())
                 .thenReturn("Abc123xyZ9");
+
+        when(trainingTypeDao.findByName(
+                TrainingTypeName.STRENGTH
+        )).thenReturn(Optional.of(trainingType));
+
         when(trainerDao.save(any(Trainer.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0)
+                );
 
         Trainer result = trainerService.create(
                 "John",
@@ -102,65 +155,365 @@ class TrainerServiceTest {
                 TrainingTypeName.STRENGTH
         );
 
-        assertEquals(1L, result.getUserId());
-        assertEquals("John", result.getFirstName());
-        assertEquals("Smith", result.getLastName());
-        assertEquals("John.Smith", result.getUsername());
-        assertEquals("Abc123xyZ9", result.getPassword());
         assertEquals(
-                TrainingTypeName.STRENGTH,
+                "John",
+                result.getUser().getFirstName()
+        );
+
+        assertEquals(
+                "Smith",
+                result.getUser().getLastName()
+        );
+
+        assertEquals(
+                "John.Smith",
+                result.getUser().getUsername()
+        );
+
+        assertEquals(
+                "Abc123xyZ9",
+                result.getUser().getPassword()
+        );
+
+        assertTrue(
+                result.getUser().isActive()
+        );
+
+        assertSame(
+                trainingType,
                 result.getSpecialization()
         );
-        assertTrue(result.isActive());
 
-        verify(idGenerator).nextUserId();
-        verify(usernameGenerator).generate("John", "Smith");
-        verify(passwordGenerator).generate();
-        verify(trainerDao).save(result);
+        verify(usernameGenerator)
+                .generate("John", "Smith");
+
+        verify(passwordGenerator)
+                .generate();
+
+        verify(trainingTypeDao)
+                .findByName(
+                        TrainingTypeName.STRENGTH
+                );
+
+        verify(trainerDao)
+                .save(any(Trainer.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTrainingTypeDoesNotExistDuringCreate() {
+        when(usernameGenerator.generate(
+                "John",
+                "Smith"
+        )).thenReturn("John.Smith");
+
+        when(passwordGenerator.generate())
+                .thenReturn("Abc123xyZ9");
+
+        when(trainingTypeDao.findByName(
+                TrainingTypeName.STRENGTH
+        )).thenReturn(Optional.empty());
+
+        assertThrows(
+                NoSuchElementException.class,
+                () -> trainerService.create(
+                        "John",
+                        "Smith",
+                        TrainingTypeName.STRENGTH
+                )
+        );
+
+        verify(trainerDao, never())
+                .save(any());
     }
 
     @Test
     void shouldUpdateTrainer() {
         Trainer trainer = createTrainer();
 
-        when(trainerDao.findById(1L))
-                .thenReturn(Optional.of(trainer));
-        when(trainerDao.update(any(Trainer.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        TrainingType newTrainingType =
+                new TrainingType(
+                        TrainingTypeName.CARDIO
+                );
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        when(trainingTypeDao.findByName(
+                TrainingTypeName.CARDIO
+        )).thenReturn(
+                Optional.of(newTrainingType)
+        );
 
         Trainer result = trainerService.update(
                 "Jonathan",
                 "Johnson",
-                false,
                 TrainingTypeName.CARDIO,
-                1L
+                "John.Smith",
+                "Abc123xyZ9"
         );
 
         assertSame(trainer, result);
-        assertEquals("Jonathan", result.getFirstName());
-        assertEquals("Johnson", result.getLastName());
-        assertFalse(result.isActive());
+
         assertEquals(
-                TrainingTypeName.CARDIO,
+                "Jonathan",
+                result.getUser().getFirstName()
+        );
+
+        assertEquals(
+                "Johnson",
+                result.getUser().getLastName()
+        );
+
+        assertSame(
+                newTrainingType,
                 result.getSpecialization()
         );
 
-        assertEquals("John.Smith", result.getUsername());
-        assertEquals("Abc123xyZ9", result.getPassword());
+        assertEquals(
+                "John.Smith",
+                result.getUser().getUsername()
+        );
 
-        verify(trainerDao).findById(1L);
-        verify(trainerDao).update(trainer);
+        assertEquals(
+                "Abc123xyZ9",
+                result.getUser().getPassword()
+        );
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao)
+                .findByUsername("John.Smith");
+
+        verify(trainingTypeDao)
+                .findByName(
+                        TrainingTypeName.CARDIO
+                );
+
+        verify(trainerDao, never())
+                .update(any());
     }
 
-    private Trainer createTrainer() {
-        return new Trainer(
-                1L,
+    @Test
+    void shouldFindTrainerByUsername() {
+        Trainer trainer = createTrainer();
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        Trainer result =
+                trainerService.findByUsername(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        assertSame(trainer, result);
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao)
+                .findByUsername("John.Smith");
+    }
+
+    @Test
+    void shouldChangePassword() {
+        Trainer trainer = createTrainer();
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        trainerService.changePassword(
+                "John.Smith",
+                "Abc123xyZ9",
+                "NewPassword1"
+        );
+
+        assertEquals(
+                "NewPassword1",
+                trainer.getUser().getPassword()
+        );
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao, never())
+                .update(any());
+    }
+
+    @Test
+    void shouldActivateInactiveTrainer() {
+        Trainer trainer = createTrainer(
                 "John",
                 "Smith",
                 "John.Smith",
+                TrainingTypeName.STRENGTH,
+                false
+        );
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        trainerService.activate(
+                "John.Smith",
+                "Abc123xyZ9"
+        );
+
+        assertTrue(
+                trainer.getUser().isActive()
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenActivatingAlreadyActiveTrainer() {
+        Trainer trainer = createTrainer();
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> trainerService.activate(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                )
+        );
+    }
+
+    @Test
+    void shouldDeactivateActiveTrainer() {
+        Trainer trainer = createTrainer();
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        trainerService.deactivate(
+                "John.Smith",
+                "Abc123xyZ9"
+        );
+
+        assertFalse(
+                trainer.getUser().isActive()
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeactivatingAlreadyInactiveTrainer() {
+        Trainer trainer = createTrainer(
+                "John",
+                "Smith",
+                "John.Smith",
+                TrainingTypeName.STRENGTH,
+                false
+        );
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> trainerService.deactivate(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                )
+        );
+    }
+
+    @Test
+    void shouldFindTrainersNotAssignedToTrainee() {
+        Trainer first = createTrainer(
+                "Anna",
+                "Brown",
+                "Anna.Brown",
+                TrainingTypeName.YOGA,
+                true
+        );
+
+        Trainer second = createTrainer(
+                "Mike",
+                "Jones",
+                "Mike.Jones",
+                TrainingTypeName.CARDIO,
+                true
+        );
+
+        when(trainerDao.findNotAssignedToTrainee(
+                "John.Smith"
+        )).thenReturn(
+                List.of(first, second)
+        );
+
+        List<Trainer> result =
+                trainerService.findNotAssignedToTrainee(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains(first));
+        assertTrue(result.contains(second));
+
+        verify(authenticationService)
+                .requireTraineeAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao)
+                .findNotAssignedToTrainee(
+                        "John.Smith"
+                );
+    }
+
+    private Trainer createTrainer() {
+        return createTrainer(
+                "John",
+                "Smith",
+                "John.Smith",
+                TrainingTypeName.STRENGTH,
+                true
+        );
+    }
+
+    private Trainer createTrainer(
+            String firstName,
+            String lastName,
+            String username,
+            TrainingTypeName specialization,
+            boolean active
+    ) {
+        User user = new User(
+                firstName,
+                lastName,
+                username,
                 "Abc123xyZ9",
-                true,
-                TrainingTypeName.STRENGTH
+                active
+        );
+
+        TrainingType trainingType =
+                new TrainingType(
+                        specialization
+                );
+
+        return new Trainer(
+                trainingType,
+                user
         );
     }
 }
