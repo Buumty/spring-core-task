@@ -146,6 +146,78 @@ class TrainerServiceTest {
     }
 
     @Test
+    void shouldUpdateTrainer() {
+        Trainer trainer = createTrainer();
+
+        TrainingType newTrainingType =
+                new TrainingType(
+                        TrainingTypeName.CARDIO
+                );
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        when(trainingTypeDao.findByName(
+                TrainingTypeName.CARDIO
+        )).thenReturn(
+                Optional.of(newTrainingType)
+        );
+
+        Trainer result = trainerService.update(
+                "Jonathan",
+                "Johnson",
+                TrainingTypeName.CARDIO,
+                "John.Smith",
+                "Abc123xyZ9"
+        );
+
+        assertSame(trainer, result);
+
+        assertEquals(
+                "Jonathan",
+                result.getUser().getFirstName()
+        );
+
+        assertEquals(
+                "Johnson",
+                result.getUser().getLastName()
+        );
+
+        assertSame(
+                newTrainingType,
+                result.getSpecialization()
+        );
+
+        assertEquals(
+                "John.Smith",
+                result.getUser().getUsername()
+        );
+
+        assertEquals(
+                "Abc123xyZ9",
+                result.getUser().getPassword()
+        );
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao)
+                .findByUsername("John.Smith");
+
+        verify(trainingTypeDao)
+                .findByName(
+                        TrainingTypeName.CARDIO
+                );
+
+        verify(trainerDao, never())
+                .update(any());
+    }
+
+    @Test
     void shouldFindTrainerByUsername() {
         Trainer trainer = createTrainer();
 
@@ -171,6 +243,34 @@ class TrainerServiceTest {
                 .findByUsername("John.Smith");
     }
 
+    @Test
+    void shouldChangePassword() {
+        Trainer trainer = createTrainer();
+
+        when(trainerDao.findByUsername(
+                "John.Smith"
+        )).thenReturn(Optional.of(trainer));
+
+        trainerService.changePassword(
+                "John.Smith",
+                "Abc123xyZ9",
+                "NewPassword1"
+        );
+
+        assertEquals(
+                "NewPassword1",
+                trainer.getUser().getPassword()
+        );
+
+        verify(authenticationService)
+                .requireTrainerAuthentication(
+                        "John.Smith",
+                        "Abc123xyZ9"
+                );
+
+        verify(trainerDao, never())
+                .update(any());
+    }
 
     @Test
     void shouldActivateInactiveTrainer() {
