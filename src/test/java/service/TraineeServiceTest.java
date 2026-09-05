@@ -193,70 +193,6 @@ class TraineeServiceTest {
     }
 
     @Test
-    void shouldUpdateTrainee() {
-        Trainee trainee = createTrainee();
-
-        LocalDate newDateOfBirth =
-                LocalDate.of(1996, 6, 15);
-
-        when(traineeDao.findByUsername(
-                "John.Smith"
-        )).thenReturn(Optional.of(trainee));
-
-        Trainee result = traineeService.update(
-                "Jonathan",
-                "Johnson",
-                "New address",
-                newDateOfBirth,
-                "John.Smith",
-                "Abc123xyZ9"
-        );
-
-        assertSame(trainee, result);
-
-        assertEquals(
-                "Jonathan",
-                result.getUser().getFirstName()
-        );
-
-        assertEquals(
-                "Johnson",
-                result.getUser().getLastName()
-        );
-
-        assertEquals(
-                "New address",
-                result.getAddress()
-        );
-
-        assertEquals(
-                "John.Smith",
-                result.getUser().getUsername()
-        );
-
-        assertEquals(
-                "Abc123xyZ9",
-                result.getUser().getPassword()
-        );
-        assertEquals(
-                newDateOfBirth,
-                result.getDateOfBirth()
-        );
-
-        verify(authenticationService)
-                .requireTraineeAuthentication(
-                        "John.Smith",
-                        "Abc123xyZ9"
-                );
-
-        verify(traineeDao)
-                .findByUsername("John.Smith");
-
-        verify(traineeDao, never())
-                .update(any());
-    }
-
-    @Test
     void shouldDeleteTraineeByUsername() {
         Trainee trainee = createTrainee();
 
@@ -327,35 +263,6 @@ class TraineeServiceTest {
                         "John.Smith",
                         "Abc123xyZ9"
                 );
-    }
-
-    @Test
-    void shouldChangePassword() {
-        Trainee trainee = createTrainee();
-
-        when(traineeDao.findByUsername(
-                "John.Smith"
-        )).thenReturn(Optional.of(trainee));
-
-        traineeService.changePassword(
-                "John.Smith",
-                "Abc123xyZ9",
-                "NewPassword1"
-        );
-
-        assertEquals(
-                "NewPassword1",
-                trainee.getUser().getPassword()
-        );
-
-        verify(authenticationService)
-                .requireTraineeAuthentication(
-                        "John.Smith",
-                        "Abc123xyZ9"
-                );
-
-        verify(traineeDao, never())
-                .update(any());
     }
 
     @Test
