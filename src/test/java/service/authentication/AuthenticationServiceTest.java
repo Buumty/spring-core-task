@@ -2,11 +2,7 @@ package service.authentication;
 
 import org.example.dao.TraineeDao;
 import org.example.dao.TrainerDao;
-import org.example.model.Trainee;
-import org.example.model.Trainer;
-import org.example.model.TrainingType;
-import org.example.model.TrainingTypeName;
-import org.example.model.User;
+import org.example.model.*;
 import org.example.service.authentication.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +14,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {

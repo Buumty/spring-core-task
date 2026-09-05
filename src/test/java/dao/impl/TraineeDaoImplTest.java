@@ -20,7 +20,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeDaoImplTest {
@@ -146,29 +147,6 @@ class TraineeDaoImplTest {
         assertSame(trainee, result);
 
         verify(session).merge(trainee);
-    }
-
-    @Test
-    void shouldDeleteTraineeById() {
-        Trainee trainee = createTrainee(
-                "John",
-                "Smith",
-                "John.Smith"
-        );
-
-        when(session.getReference(
-                Trainee.class,
-                1L
-        )).thenReturn(trainee);
-
-        traineeDao.deleteById(1L);
-
-        verify(session).getReference(
-                Trainee.class,
-                1L
-        );
-
-        verify(session).remove(trainee);
     }
 
     @Test

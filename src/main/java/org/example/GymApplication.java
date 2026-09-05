@@ -3,11 +3,15 @@ package org.example;
 import org.example.config.AppConfig;
 import org.example.facade.GymFacade;
 import org.example.model.Trainee;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDate;
 
 public class GymApplication {
+
+    private static final Logger log = LoggerFactory.getLogger(GymApplication.class);
 
     public static void main(String[] args) {
 
@@ -17,7 +21,7 @@ public class GymApplication {
             GymFacade gymFacade =
                     context.getBean(GymFacade.class);
 
-            System.out.println("Spring context started successfully.");
+            log.debug("Spring context started successfully.");
 
             Trainee trainee = gymFacade.createTrainee(
                     "John",
@@ -26,7 +30,7 @@ public class GymApplication {
                     "Example address"
             );
 
-            System.out.println(
+            log.info(
                     "Created trainee: "
                             + trainee.getUser().getUsername()
             );

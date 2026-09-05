@@ -28,19 +28,6 @@ public class TraineeDaoImpl implements TraineeDao {
     }
 
     @Override
-    public Trainee update(Trainee trainee) {
-        sessionFactory.getCurrentSession().merge(trainee);
-        return trainee;
-    }
-
-    @Override
-    public void deleteById(long id) {
-        Trainee trainee = sessionFactory.getCurrentSession().getReference(Trainee.class, id);
-
-        sessionFactory.getCurrentSession().remove(trainee);
-    }
-
-    @Override
     public Optional<Trainee> findById(long id) {
         return Optional.ofNullable(
                 sessionFactory.getCurrentSession()
