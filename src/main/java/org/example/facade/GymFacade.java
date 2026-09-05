@@ -170,28 +170,6 @@ public class GymFacade {
         );
     }
 
-    public Trainer findTrainerById(
-            long id,
-            String username,
-            String password
-    ) {
-        return trainerService.findById(
-                id,
-                username,
-                password
-        );
-    }
-
-    public List<Trainer> findAllTrainers(
-            String username,
-            String password
-    ) {
-        return trainerService.findAll(
-                username,
-                password
-        );
-    }
-
     public Trainer updateTrainer(
             String firstName,
             String lastName,

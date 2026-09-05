@@ -68,9 +68,13 @@ public class TrainingDaoImpl implements TrainingDao {
         if (trainerName != null && !trainerName.isBlank()) {
             hql.append("""
                  AND (
-                     LOWER(t.trainer.user.firstName) = LOWER(:trainerName)
-                     OR LOWER(t.trainer.user.lastName) = LOWER(:trainerName)
-                 )
+                         LOWER(t.trainer.user.firstName) = LOWER(:trainerName)
+                         OR LOWER(t.trainer.user.lastName) = LOWER(:trainerName)
+                         OR LOWER(CONCAT(
+                             CONCAT(t.trainer.user.firstName, ' '),
+                             t.trainer.user.lastName
+                         )) = LOWER(:trainerName)
+                     )
                 """);
         }
 

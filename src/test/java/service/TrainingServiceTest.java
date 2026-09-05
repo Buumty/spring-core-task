@@ -43,57 +43,6 @@ class TrainingServiceTest {
     private TrainingService trainingService;
 
     @Test
-    void shouldFindTrainingById() {
-        Training training = createTraining();
-
-        when(trainingDao.findById(1L))
-                .thenReturn(Optional.of(training));
-
-        Training result = trainingService.findById(1L);
-
-        assertSame(training, result);
-
-        verify(trainingDao).findById(1L);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTrainingDoesNotExist() {
-        when(trainingDao.findById(999L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(
-                NoSuchElementException.class,
-                () -> trainingService.findById(999L)
-        );
-
-        verify(trainingDao).findById(999L);
-    }
-
-    @Test
-    void shouldReturnAllTrainings() {
-        Training first = createTraining();
-
-        Training second = createTraining(
-                "Cardio training",
-                TrainingTypeName.CARDIO,
-                LocalDate.of(2026, 8, 11),
-                45
-        );
-
-        when(trainingDao.findAll())
-                .thenReturn(List.of(first, second));
-
-        List<Training> result =
-                trainingService.findAll();
-
-        assertEquals(2, result.size());
-        assertTrue(result.contains(first));
-        assertTrue(result.contains(second));
-
-        verify(trainingDao).findAll();
-    }
-
-    @Test
     void shouldCreateTraining() {
         Trainee trainee = createTrainee();
         TrainingType trainingType =

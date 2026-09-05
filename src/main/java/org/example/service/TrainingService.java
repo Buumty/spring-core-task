@@ -40,23 +40,10 @@ public class TrainingService {
         this.authenticationService = authenticationService;
     }
 
-    public Training findById(long id) {
-        log.debug("Searching for training with id={}", id);
-        return trainingDao.findById(id).orElseThrow(() -> {
-            log.warn("Training with id={} was not found", id);
-            return new NoSuchElementException("Training with id " + id + " was not found");
-        });
-    }
-
-    public List<Training> findAll() {
-        log.debug("Retrieving all trainings");
-        return trainingDao.findAll();
-    }
-
     public List<Training> getTraineeTrainings(
-            String authUsername,
-            String authPassword,
-            String traineeUsername,
+            @NotBlank String authUsername,
+            @NotBlank String authPassword,
+            @NotBlank String traineeUsername,
             LocalDate fromDate,
             LocalDate toDate,
             String trainerName,
@@ -70,10 +57,27 @@ public class TrainingService {
         if (fromDate != null
                 && toDate != null
                 && fromDate.isAfter(toDate)) {
+
+            log.warn(
+                    "Invalid trainee training date range: fromDate={} toDate={} traineeUsername={}",
+                    fromDate,
+                    toDate,
+                    traineeUsername
+            );
+
             throw new IllegalArgumentException(
                     "From date cannot be after to date"
             );
         }
+
+        log.debug(
+                "Searching trainee trainings for username={} fromDate={} toDate={} trainerName={} trainingType={}",
+                traineeUsername,
+                fromDate,
+                toDate,
+                trainerName,
+                trainingType
+        );
 
         return trainingDao.findTraineeTrainings(
                 traineeUsername,
@@ -84,9 +88,9 @@ public class TrainingService {
         );
     }
     public List<Training> getTrainerTrainings(
-            String authUsername,
-            String authPassword,
-            String trainerUsername,
+            @NotBlank String authUsername,
+            @NotBlank String authPassword,
+            @NotBlank String trainerUsername,
             LocalDate fromDate,
             LocalDate toDate,
             String traineeName
@@ -99,10 +103,26 @@ public class TrainingService {
         if (fromDate != null
                 && toDate != null
                 && fromDate.isAfter(toDate)) {
+
+            log.warn(
+                    "Invalid trainer training date range: fromDate={} toDate={} trainerUsername={}",
+                    fromDate,
+                    toDate,
+                    trainerUsername
+            );
+
             throw new IllegalArgumentException(
                     "From date cannot be after to date"
             );
         }
+
+        log.debug(
+                "Searching trainer trainings for username={} fromDate={} toDate={} traineeName={}",
+                trainerUsername,
+                fromDate,
+                toDate,
+                traineeName
+        );
 
         return trainingDao.findTrainerTrainings(
                 trainerUsername,
@@ -161,6 +181,18 @@ public class TrainingService {
                 trainingDuration
         );
 
-        return trainingDao.save(training);
+        Training savedTraining = trainingDao.save(training);
+
+        log.info(
+                "Created training name={} traineeUsername={} trainerUsername={} type={} date={} duration={}",
+                trainingName,
+                traineeUsername,
+                trainerUsername,
+                trainingTypeName,
+                trainingDate,
+                trainingDuration
+        );
+
+        return savedTraining;
     }
 }

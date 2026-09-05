@@ -129,9 +129,9 @@ public class TraineeService {
 
     @Transactional
     public void changePassword(
-            String username,
-            String oldPassword,
-            String newPassword
+            @NotBlank String username,
+            @NotBlank String oldPassword,
+            @NotBlank String newPassword
     ) {
         authenticationService
                 .requireTraineeAuthentication(
@@ -155,8 +155,8 @@ public class TraineeService {
                     "Trainee is already active"
             );
         }
-
         trainee.getUser().setActive(true);
+        log.info("Activated trainee username={}", username);
     }
 
     @Transactional
@@ -172,6 +172,7 @@ public class TraineeService {
         }
 
         trainee.getUser().setActive(false);
+        log.info("Deactivated trainee username={}", username);
     }
 
     @Transactional

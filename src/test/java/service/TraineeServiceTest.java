@@ -238,6 +238,10 @@ class TraineeServiceTest {
                 "Abc123xyZ9",
                 result.getUser().getPassword()
         );
+        assertEquals(
+                newDateOfBirth,
+                result.getDateOfBirth()
+        );
 
         verify(authenticationService)
                 .requireTraineeAuthentication(

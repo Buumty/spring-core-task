@@ -321,57 +321,6 @@ class GymFacadeTest {
         );
     }
 
-    @Test
-    void shouldFindTrainerById() {
-        Trainer trainer = mock(Trainer.class);
-
-        when(trainerService.findById(
-                1L,
-                "Anna.Brown",
-                "password"
-        )).thenReturn(trainer);
-
-        Trainer result = gymFacade.findTrainerById(
-                1L,
-                "Anna.Brown",
-                "password"
-        );
-
-        assertSame(trainer, result);
-
-        verify(trainerService).findById(
-                1L,
-                "Anna.Brown",
-                "password"
-        );
-    }
-
-    @Test
-    void shouldFindAllTrainers() {
-        List<Trainer> trainers =
-                List.of(
-                        mock(Trainer.class),
-                        mock(Trainer.class)
-                );
-
-        when(trainerService.findAll(
-                "Anna.Brown",
-                "password"
-        )).thenReturn(trainers);
-
-        List<Trainer> result =
-                gymFacade.findAllTrainers(
-                        "Anna.Brown",
-                        "password"
-                );
-
-        assertSame(trainers, result);
-
-        verify(trainerService).findAll(
-                "Anna.Brown",
-                "password"
-        );
-    }
 
     @Test
     void shouldUpdateTrainer() {

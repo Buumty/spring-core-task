@@ -41,21 +41,6 @@ public class TrainerService {
         this.authenticationService = authenticationService;
     }
 
-    public Trainer findById(long id, String username, String password) {
-        authenticationService.requireTrainerAuthentication(username,password);
-        log.debug("Searching for trainer with id={}", id);
-        return trainerDao.findById(id).orElseThrow(() -> {
-            log.warn("Trainer with id={} was not found", id);
-            return new NoSuchElementException("Trainer with id " + id + " was not found");
-        });
-    }
-
-    public List<Trainer> findAll(String username, String password) {
-        authenticationService.requireTrainerAuthentication(username,password);
-        log.debug("Retrieving all trainers");
-        return trainerDao.findAll();
-    }
-
     @Transactional
     public Trainer create(
             @NotBlank String firstName,
@@ -114,19 +99,20 @@ public class TrainerService {
 
     @Transactional
     public void changePassword(
-            String username,
-            String oldPassword,
-            String newPassword
+            @NotBlank String username,
+            @NotBlank String oldPassword,
+            @NotBlank String newPassword
     ) {
         authenticationService.requireTrainerAuthentication(username, oldPassword);
 
         Trainer trainer = getByUsername(username);
 
         trainer.getUser().setPassword(newPassword);
+        log.info("Changed password for trainer username={}", username);
     }
 
     @Transactional
-    public void activate(String username, String password) {
+    public void activate(@NotBlank String username, @NotBlank String password) {
         authenticationService.requireTrainerAuthentication(username,password);
 
         Trainer trainer = getByUsername(username);
@@ -138,10 +124,11 @@ public class TrainerService {
         }
 
         trainer.getUser().setActive(true);
+        log.info("Activated trainer username={}", username);
     }
 
     @Transactional
-    public void deactivate(String username, String password) {
+    public void deactivate(@NotBlank String username, @NotBlank String password) {
         authenticationService.requireTrainerAuthentication(username,password);
 
         Trainer trainer = getByUsername(username);
@@ -153,14 +140,20 @@ public class TrainerService {
         }
 
         trainer.getUser().setActive(false);
+        log.info("Deactivated trainer username={}", username);
     }
     public List<Trainer> findNotAssignedToTrainee(
-            String traineeUsername,
-            String password
+            @NotBlank String traineeUsername,
+            @NotBlank String password
     ) {
         authenticationService.requireTraineeAuthentication(
                 traineeUsername,
                 password
+        );
+
+        log.debug(
+                "Searching trainers not assigned to trainee username={}",
+                traineeUsername
         );
 
         return trainerDao.findNotAssignedToTrainee(
@@ -168,7 +161,7 @@ public class TrainerService {
         );
     }
 
-    public Trainer findByUsername(String username, String password) {
+    public Trainer findByUsername(@NotBlank String username, @NotBlank String password) {
         authenticationService.requireTrainerAuthentication(username,password);
 
         return getByUsername(username);
