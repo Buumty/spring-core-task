@@ -252,8 +252,6 @@ class TraineeServiceTest {
         verify(traineeDao)
                 .findByUsername("John.Smith");
 
-        verify(traineeDao, never())
-                .update(any());
     }
 
     @Test
@@ -354,8 +352,7 @@ class TraineeServiceTest {
                         "Abc123xyZ9"
                 );
 
-        verify(traineeDao, never())
-                .update(any());
+
     }
 
     @Test

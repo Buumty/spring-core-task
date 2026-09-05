@@ -29,12 +29,6 @@ public class TrainerDaoImpl implements TrainerDao {
     }
 
     @Override
-    public Trainer update(Trainer trainer) {
-        sessionFactory.getCurrentSession().merge(trainer);
-        return trainer;
-    }
-
-    @Override
     public Optional<Trainer> findById(long id) {
         return Optional.ofNullable(sessionFactory.getCurrentSession().find(Trainer.class, id));
     }

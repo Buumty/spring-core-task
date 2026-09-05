@@ -159,23 +159,6 @@ class TrainerDaoImplTest {
     }
 
     @Test
-    void shouldUpdateTrainer() {
-        Trainer trainer = createTrainer(
-                "John",
-                "Smith",
-                "John.Smith",
-                TrainingTypeName.STRENGTH
-        );
-
-        Trainer result =
-                trainerDao.update(trainer);
-
-        assertSame(trainer, result);
-
-        verify(session).merge(trainer);
-    }
-
-    @Test
     void shouldReturnTrueWhenUsernameExists() {
         when(session.createQuery(
                 anyString(),

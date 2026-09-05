@@ -133,45 +133,6 @@ class TraineeDaoImplTest {
     }
 
     @Test
-    void shouldUpdateTrainee() {
-        Trainee trainee = createTrainee(
-                "John",
-                "Smith",
-                "John.Smith"
-        );
-
-        Trainee result =
-                traineeDao.update(trainee);
-
-        assertSame(trainee, result);
-
-        verify(session).merge(trainee);
-    }
-
-    @Test
-    void shouldDeleteTraineeById() {
-        Trainee trainee = createTrainee(
-                "John",
-                "Smith",
-                "John.Smith"
-        );
-
-        when(session.getReference(
-                Trainee.class,
-                1L
-        )).thenReturn(trainee);
-
-        traineeDao.deleteById(1L);
-
-        verify(session).getReference(
-                Trainee.class,
-                1L
-        );
-
-        verify(session).remove(trainee);
-    }
-
-    @Test
     void shouldDeleteTrainee() {
         Trainee trainee = createTrainee(
                 "John",

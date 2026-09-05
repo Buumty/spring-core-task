@@ -8,7 +8,6 @@ import java.util.Set;
 
 public interface TrainerDao {
     Trainer save(Trainer trainer);
-    Trainer update(Trainer trainer);
     Optional<Trainer> findById(long id);
     List<Trainer> findAll();
     boolean existsByUsername(String username);

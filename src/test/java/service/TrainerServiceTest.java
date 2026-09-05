@@ -212,9 +212,6 @@ class TrainerServiceTest {
                 .findByName(
                         TrainingTypeName.CARDIO
                 );
-
-        verify(trainerDao, never())
-                .update(any());
     }
 
     @Test
@@ -268,8 +265,6 @@ class TrainerServiceTest {
                         "Abc123xyZ9"
                 );
 
-        verify(trainerDao, never())
-                .update(any());
     }
 
     @Test
