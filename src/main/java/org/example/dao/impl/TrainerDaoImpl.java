@@ -1,11 +1,14 @@
 package org.example.dao.impl;
 
 import org.example.dao.TrainerDao;
+import org.example.model.Trainee;
 import org.example.model.Trainer;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,6 +25,12 @@ public class TrainerDaoImpl implements TrainerDao {
     @Override
     public Trainer save(Trainer trainer) {
         sessionFactory.getCurrentSession().persist(trainer);
+        return trainer;
+    }
+
+    @Override
+    public Trainer update(Trainer trainer) {
+        sessionFactory.getCurrentSession().merge(trainer);
         return trainer;
     }
 
